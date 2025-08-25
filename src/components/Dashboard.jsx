@@ -1,6 +1,10 @@
 import { useEffect } from "react";
-
 import { getValidToken } from "../utils/auth";
+import Header from "./Header";
+import Sidebar from "./Sidebar";
+import Footer from "./Footer";
+import "./Dashboard.css"; // fixed import path
+import axios from "axios";
 
 function Dashboard() {
   useEffect(() => {
@@ -25,7 +29,19 @@ function Dashboard() {
     };
   }, []);
 
-  return <h1>Welcome to Dashboard</h1>;
+  return (
+    <div className="app-container">
+      <Header />
+      <div className="app-body d-flex">
+        <Sidebar />
+        <main className="app-content flex-grow-1 p-3">
+          <h1>Welcome to the Dashboard</h1>
+          {/* Add your dashboard content here */}
+        </main>
+      </div>
+      <Footer />
+    </div>
+  );
 }
 
 export default Dashboard;

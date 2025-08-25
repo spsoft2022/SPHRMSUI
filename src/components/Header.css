@@ -1,0 +1,15 @@
+.app-header {
+  background: #478ed4;
+  color: #fff;
+  height: 60px;
+}
+.app-header .logo {
+  font-weight: bold;
+}
+.app-header .nav-link {
+  color: #fff;
+  margin-left: 15px;
+}
+.app-header .nav-link:hover {
+  text-decoration: underline;
+}

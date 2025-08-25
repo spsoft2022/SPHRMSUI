@@ -1,0 +1,25 @@
+.app-sidebar {
+  background: #67ade6;
+  color: #fff;          /* White text */
+  min-width: 220px;
+  height: 100vh;        /* Full height */
+}
+
+.app-sidebar ul li {
+  margin: 12px 0;
+}
+
+.app-sidebar a {
+  color: #010407;       /* Light gray */
+  text-decoration: none;
+  font-weight: 500;
+  display: block;
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+.app-sidebar a:hover {
+  background: #e7eaee;  /* Slightly lighter gray */
+  color: #070000;
+}
+
