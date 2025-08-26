@@ -3,6 +3,8 @@ import Header from "./Header";
 import Sidebar from "./Sidebar";
 import Footer from "./Footer";
 import axios from "axios";
+import * as XLSX from "xlsx";
+
 
 function Employees() {
   const [showForm, setShowForm] = useState(false);
@@ -39,7 +41,27 @@ const res = await axios.post("http://localhost:5000/api/employees/addEmployee", 
       alert(err.response?.data?.message || "Error adding employee");
     }
   };
+const handleImport = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
 
+  const reader = new FileReader();
+  reader.onload = async (event) => {
+    const data = new Uint8Array(event.target.result);
+    const workbook = XLSX.read(data, { type: "array" });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const employees = XLSX.utils.sheet_to_json(sheet);
+
+    try {
+      const res = await axios.post("http://localhost:5000/api/employees/bulkUpload", employees);
+      alert(res.data.message);
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.message || "Error uploading employees");
+    }
+  };
+  reader.readAsArrayBuffer(file);
+};
   return (
     <div className="app-container">
       <Header />
@@ -137,10 +159,14 @@ const res = await axios.post("http://localhost:5000/api/employees/addEmployee", 
               </button>
             </form>
           )}
-            <button
-            className="btn btn-primary mb-3"
-          >Import
-          </button>
+          <input
+  type="file"
+  accept=".xlsx, .xls"
+  onChange={handleImport}
+  className="d-none"
+  id="fileUpload"
+/>
+<label htmlFor="fileUpload" className="btn btn-primary mb-3">Import</label>
         </main>
       </div>
       <Footer />

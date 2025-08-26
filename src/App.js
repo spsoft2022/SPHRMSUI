@@ -1,5 +1,5 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-
+import 'font-awesome/css/font-awesome.min.css';
 import Dashboard from "./components/Dashboard";
 import Login from "./components/login";
  import Employees from "./components/Employees";

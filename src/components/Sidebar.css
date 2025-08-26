@@ -1,25 +1,50 @@
 .app-sidebar {
-  background: #67ade6;
-  color: #fff;          /* White text */
-  min-width: 220px;
-  height: 100vh;        /* Full height */
+  background-color: #eaeaea; /* your original bg */
+  min-height: 100vh;
+  transition: width 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
-.app-sidebar ul li {
-  margin: 12px 0;
+.app-sidebar.expanded {
+  width: 220px;
 }
 
-.app-sidebar a {
-  color: #010407;       /* Light gray */
-  text-decoration: none;
+.app-sidebar.collapsed {
+  width: 60px; /* collapsed width */
+}
+
+/* Sidebar button styling */
+.toggle-btn {
+  
+  font-size: 1.5rem;
+  width: 40px;
+  height: 40px;
+ color: #1c3f614b;
+}
+
+.toggle-btn:hover {
+  color: black;
+}
+
+/* Nav links styling */
+.nav-link {
+  color: #1c3f614b;
   font-weight: 500;
-  display: block;
   padding: 8px 12px;
   border-radius: 6px;
+  transition: background 0.2s, color 0.2s;
 }
 
-.app-sidebar a:hover {
-  background: #e7eaee;  /* Slightly lighter gray */
-  color: #070000;
+.nav-link i {
+  font-size: 1.2rem;
 }
 
+.nav-link:hover {
+  background-color: #d3d3d3; /* trendy hover color */
+  color: #408ead;
+}
+
+.app-sidebar.collapsed .nav-link span {
+  display: none; /* hide text in collapsed */
+}
