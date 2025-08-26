@@ -1,34 +1,29 @@
 /* Header Styles */
 .app-header {
   background: linear-gradient(to bottom, #65327c, #3a4696); /* Violet top to blue bottom */
- 
-  /* background-image: linear-gradient(#65327c, #3a4696) */
   color: white;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  
   position: relative;
-  height: 60px; /* Set a fixed height for the header */
+  height: 60px;
 }
- 
+
 .logo-container {
   display: flex;
   align-items: center;
 }
- 
- 
+
 .logo-img {
   width: 40px;
   height: 40px;
   margin-right: 10px;
 }
-c
 .logo-text {
   font-size: 24px;
   font-weight: bold;
 }
- 
+
 .page-title {
   font-size: 18px;
   color: white;
@@ -36,24 +31,24 @@ c
   text-align: center;
   flex-grow: 1; /* Ensure the title is centered */
 }
- 
+
 .user-profile {
   display: flex;
   align-items: center;
   color: white;
 }
- 
+
 .user-name {
   margin-right: 10px;
   font-size: 16px;
 }
- 
+
 .profile-icon {
   width: 30px;
   height: 30px;
   border-radius: 50%;
 }
- 
+
 /* Button for toggling sidebar (only visible on mobile) */
 .btn-outline-light {
   border: none;
@@ -61,7 +56,7 @@ c
   color: white;
   font-size: 24px;
 }
- 
+
 .d-md-none {
   display: block;
 }
@@ -90,7 +85,7 @@ c
   padding: 0;
   margin: 0;
   border-radius: 6px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   z-index: 100;
 }
 
@@ -109,11 +104,8 @@ c
   background-color: #f0f0f0;
 }
 
- 
 @media (min-width: 768px) {
   .d-md-none {
     display: none; /* Hide the toggle button on larger screens */
   }
 }
- 
- 

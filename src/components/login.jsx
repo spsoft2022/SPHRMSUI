@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import logo from "../assets/spsoft_logo.jpg";
+import logo from "../assets/spsoft.svg";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -9,6 +9,13 @@ const Login = () => {
   const [empId, setEmpId] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/associates", { replace: true });
+    }
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,12 +33,10 @@ const Login = () => {
       setMessage(data.message);
 
       if (response.ok) {
-        console.log("Login success:", data);
-
-        // ✅ Save token to localStorage
+        // Save token
         localStorage.setItem("token", data.token);
 
-        navigate("/dashboard");
+        navigate("/associates", { replace: true });
       } else {
         console.log("Login failed:", data);
       }
@@ -44,7 +49,7 @@ const Login = () => {
   return (
     <div className="bg-light d-flex justify-content-center align-items-center vh-100">
       <div className="card shadow p-4" style={{ width: "350px", borderRadius: "15px" }}>
-        <div className="d-flex justify-content-center">
+        <div className="d-flex justify-content-center pb-3">
           <img src={logo} alt="logo" className="lookUp" />
         </div>
 

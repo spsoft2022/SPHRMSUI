@@ -1,23 +1,24 @@
+import "font-awesome/css/font-awesome.min.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import 'font-awesome/css/font-awesome.min.css';
-import Dashboard from "./components/Dashboard";
-import Login from "./components/login";
- import Employees from "./components/Employees";
-import LeaveMangement from "./components/LeaveManagement";
-import Settings from "./components/Settings";
+
+import LandingPage from "./components/LandingPage";
+import Login from "./components/Login";
+import AuthRouteHandler from "./routes/handlers/AuthRouteHandler";
+
 function App() {
   return (
     <BrowserRouter>
-   <Routes>
-  <Route path="/" element={<Login />} />
-  <Route path="/dashboard" element={<Dashboard />} />
-  <Route path="/employees" element={<Employees />} /> 
-   <Route path="/leaves" element={<LeaveMangement />} />
- <Route path="/settings" element={<Settings />} />
-</Routes>
+      <Routes>
+        {/* Public Route */}
+        <Route path="/" element={<Login />} />
+
+        {/* Protected Route wrapped in AuthRouteHandler */}
+        <Route element={<AuthRouteHandler />}>
+          <Route path="/*" element={<LandingPage />} />
+        </Route>
+      </Routes>
     </BrowserRouter>
   );
 }
- 
+
 export default App;
- 

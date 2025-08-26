@@ -1,9 +1,27 @@
-import React from "react";
-import "./Header.css";
-import logo from "../assets/image (1).png";
+import axios from "axios";
 import "font-awesome/css/font-awesome.min.css";
+import { useNavigate } from "react-router-dom";
 
-export default function Header({ toggleSidebar }) {
+import logo from "../../../assets/spsoft_logo.png";
+import "./Header.css";
+
+export default function Header() {
+  const navigate = useNavigate();
+
+  /*
+   * Logs out the user by sending a POST request and clearing the token from localStorage.
+   * Navigates to the home page and logs any errors if the request fails.
+   */
+  const handleLogout = async () => {
+    try {
+      await axios.post("http://localhost:5000/api/auth/logout");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+    localStorage.removeItem("token");
+    navigate("/");
+  };
+
   return (
     <header className="app-header d-flex align-items-center justify-content-between px-3 py-2">
       {/* Logo Section */}
@@ -22,18 +40,12 @@ export default function Header({ toggleSidebar }) {
         </div>
         <ul className="dropdown-menu dropdown-menu-end">
           <li>
-            <button className="dropdown-item">Logout</button>
+            <button className="dropdown-item" onClick={handleLogout}>
+              Logout
+            </button>
           </li>
         </ul>
       </div>
-
-      {/* Sidebar toggle for mobile */}
-      <button
-        className="btn btn-outline-light d-md-none"
-        onClick={toggleSidebar}
-      >
-        ☰
-      </button>
     </header>
   );
 }
