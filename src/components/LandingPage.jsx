@@ -18,7 +18,6 @@ import Uploads from "./uploads/Uploads";
 function LandingPage() {
   useEffect(() => {
     const handleUserAction = async () => {
-      console.log("User performed an action");
 
       const token = localStorage.getItem("token");
       if (!token) return; // skip if not logged in
