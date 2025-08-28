@@ -390,4 +390,4 @@ function RegistrationDetailsForm() {
   );
 }
 
-export default RegistrationDetailsForm;
+export default RegistrationDetailsForm
