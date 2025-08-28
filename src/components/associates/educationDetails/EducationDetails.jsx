@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Form, Button, Row, Col, Table } from "react-bootstrap";
+import { useState } from "react";
+import { Button, Col, Form, Row } from "react-bootstrap";
 
 const EducationDetails = () => {
   const [formData, setFormData] = useState({
@@ -17,10 +17,21 @@ const EducationDetails = () => {
   const [records, setRecords] = useState([]);
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+
+    // Only allow numbers for associateNo
+    if (name === "associateNo") {
+      const onlyNumbers = value.replace(/\D/g, ""); // remove non-numeric
+      setFormData({
+        ...formData,
+        [name]: onlyNumbers,
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    }
   };
 
   const handleSubmit = (e) => {
@@ -44,29 +55,40 @@ const EducationDetails = () => {
   };
 
   return (
-    <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
-      <h4 className="mb-3">Add Education Details</h4>
-
+    <div>
       <Form onSubmit={handleSubmit}>
         {/* Associate Number */}
-        <Form.Group className="mb-3">
-          <Form.Label>Associate No</Form.Label>
-          <Form.Control
-            type="text"
-            name="associateNo"
-            value={formData.associateNo}
-            onChange={handleChange}
-            placeholder="Enter Associate No"
-            required
-          />
-        </Form.Group>
+        <Row className="mb-3">
+          <Col md={4}>
+            <Form.Group className="mb-3">
+              <Form.Label>Associate No</Form.Label>
+              <Form.Control
+                type="text"
+                name="associateNo"
+                value={formData.associateNo}
+                onChange={handleChange}
+                placeholder="Enter Associate No"
+                required
+              />
+            </Form.Group>
+          </Col>
+        </Row>
+        <h5 className="mt-4 mb-3">Add Education Details</h5>
 
         <Row>
           <Col md={4}>
             <Form.Group className="mb-3">
               <Form.Label>Qualification</Form.Label>
-              <Form.Select name="qualification" value={formData.qualification} onChange={handleChange} required>
-                <option value="">Select Qualification</option>
+              <Form.Select
+                name="qualification"
+                value={formData.qualification}
+                onChange={handleChange}
+                required
+                className={formData.qualification === "" ? "placeholder-select" : ""}
+              >
+                <option value="" disabled>
+                  Select Qualification
+                </option>
                 <option value="10th Class">10th Class</option>
                 <option value="12th Class/Intermediate">12th Class/Intermediate</option>
                 <option value="Graduation">Graduation</option>
@@ -170,45 +192,12 @@ const EducationDetails = () => {
             </Form.Group>
           </Col>
         </Row>
-
-        <Button type="submit" variant="primary" className="mt-2">
-          CREATE
-        </Button>
+        <div className="text-center mt-3">
+          <Button type="submit" variant="primary" className="mt-2">
+            CREATE
+          </Button>
+        </div>
       </Form>
-
-      {/* Table below */}
-      {records.length > 0 && (
-        <Table striped bordered hover responsive className="mt-4">
-          <thead>
-            <tr>
-              <th>Associate No</th>
-              <th>Qualification</th>
-              <th>Specialization</th>
-              <th>Institute</th>
-              <th>Board</th>
-              <th>University</th>
-              <th>Enrolled Year</th>
-              <th>Year of Passing</th>
-              <th>Percentage</th>
-            </tr>
-          </thead>
-          <tbody>
-            {records.map((rec, index) => (
-              <tr key={index}>
-                <td>{rec.associateNo}</td>
-                <td>{rec.qualification}</td>
-                <td>{rec.specialization}</td>
-                <td>{rec.instituteName}</td>
-                <td>{rec.boardName}</td>
-                <td>{rec.universityName}</td>
-                <td>{rec.enrolledYear}</td>
-                <td>{rec.yearOfPassing}</td>
-                <td>{rec.percentage}</td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
-      )}
     </div>
   );
 };

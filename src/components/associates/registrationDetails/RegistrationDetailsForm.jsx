@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Form, Button, Row, Col } from "react-bootstrap";
+import { useState } from "react";
+import { Button, Col, Form, Row } from "react-bootstrap";
 
 function RegistrationDetailsForm() {
   const [formData, setFormData] = useState({
@@ -61,7 +61,7 @@ function RegistrationDetailsForm() {
               <div>
                 <Form.Check
                   inline
-                  label="Single"
+                  label={<span className="custom-radio-label">Single</span>}
                   type="radio"
                   name="maritalStatus"
                   value="Single"
@@ -70,7 +70,7 @@ function RegistrationDetailsForm() {
                 />
                 <Form.Check
                   inline
-                  label="Married"
+                  label={<span className="custom-radio-label">Married</span>}
                   type="radio"
                   name="maritalStatus"
                   value="Married"
@@ -87,16 +87,19 @@ function RegistrationDetailsForm() {
                 name="bloodGroup"
                 value={formData.bloodGroup}
                 onChange={handleChange}
+                className={formData.bloodGroup === "" ? "placeholder-select" : ""}
               >
-                <option value="">Select Blood Group</option>
-                <option>A+</option>
-                <option>A-</option>
-                <option>B+</option>
-                <option>B-</option>
-                <option>O+</option>
-                <option>O-</option>
-                <option>AB+</option>
-                <option>AB-</option>
+                <option value="" disabled>
+                  Select Blood Group
+                </option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
               </Form.Select>
             </Form.Group>
           </Col>
@@ -215,11 +218,14 @@ function RegistrationDetailsForm() {
                 name="designation"
                 value={formData.designation}
                 onChange={handleChange}
+                className={formData.designation === "" ? "placeholder-select" : ""}
               >
-                <option value="">Select Designation</option>
-                <option>Developer</option>
-                <option>Designer</option>
-                <option>Manager</option>
+                <option value="" disabled>
+                  Select Designation
+                </option>
+                <option value="Developer">Developer</option>
+                <option value="Designer">Designer</option>
+                <option value="Manager">Manager</option>
               </Form.Select>
             </Form.Group>
           </Col>
@@ -227,7 +233,6 @@ function RegistrationDetailsForm() {
 
         {/* Fifth Row - 2nd Emergency, Relation, Relation Name */}
         <Row>
-
           <Col md={4}>
             <Form.Group className="mb-3">
               <Form.Label>Emergency Contact Number</Form.Label>
@@ -315,20 +320,23 @@ function RegistrationDetailsForm() {
                 name="revision"
                 value={formData.revision}
                 onChange={handleChange}
+                className={formData.revision === "" ? "placeholder-select" : ""}
               >
-                <option value="">Select Next Revision</option>
-                <option>January</option>
-                <option>February</option>
-                <option>March</option>
-                <option>April</option>
-                <option>May</option>
-                <option>June</option>
-                <option>July</option>
-                <option>August</option>
-                <option>September</option>
-                <option>October</option>
-                <option>November</option>
-                <option>December</option>
+                <option value="" disabled>
+                  Select Next Revision
+                </option>
+                <option value="January">January</option>
+                <option value="February">February</option>
+                <option value="March">March</option>
+                <option value="April">April</option>
+                <option value="May">May</option>
+                <option value="June">June</option>
+                <option value="July">July</option>
+                <option value="August">August</option>
+                <option value="September">September</option>
+                <option value="October">October</option>
+                <option value="November">November</option>
+                <option value="December">December</option>
               </Form.Select>
             </Form.Group>
           </Col>
@@ -390,4 +398,4 @@ function RegistrationDetailsForm() {
   );
 }
 
-export default RegistrationDetailsForm
+export default RegistrationDetailsForm;

@@ -4,6 +4,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import LandingPage from "./components/LandingPage";
 import Login from "./components/Login";
 import AuthRouteHandler from "./routes/handlers/AuthRouteHandler";
+import "./App.css";
 
 function App() {
   return (

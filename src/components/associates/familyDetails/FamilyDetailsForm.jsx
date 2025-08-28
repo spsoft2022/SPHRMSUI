@@ -1,89 +1,175 @@
-import React from "react";
-import { Form, Button, Row, Col } from "react-bootstrap";
+import { useState } from "react";
+import { Button, Col, Form, Row } from "react-bootstrap";
 
-const FamilyDetailsForm = () => {
+function FamilyDetailsForm() {
+  const [associateNo, setAssociateNo] = useState("");
+  const [formData, setFormData] = useState({
+    fatherName: "",
+    fatherDob: "",
+    fatherAadhar: "",
+    fatherMobile: "",
+    motherName: "",
+    motherDob: "",
+    motherAadhar: "",
+    motherMobile: "",
+  });
+
+  // Allow only numbers for Associate No
+  const handleAssociateChange = (e) => {
+    const value = e.target.value.replace(/\D/g, ""); // remove non-digits
+    setAssociateNo(value);
+  };
+
+  // Handle all input changes
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  // Handle Submit
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const finalData = {
+      associateNo,
+      ...formData,
+    };
+    console.log("Saved Family Details:", finalData);
+  };
+
   return (
-    <Form style={{ margin: "0 auto" }}>
-      {/* Associate Number */}
-      <Form.Group className="mb-3">
-        <Form.Label>Associate No</Form.Label>
-        <Form.Control type="text" placeholder="Enter Associate No" />
-      </Form.Group>
+    <div className="container mt-4">
+      <Form onSubmit={handleSubmit}>
+        {/* Associate Number */}
+        <Row className="mb-3">
+          <Col md={4}>
+            <Form.Group className="mb-3" controlId="associateNo">
+              <Form.Label>Associate No</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Enter Associate No"
+                value={associateNo}
+                onChange={handleAssociateChange}
+                required
+              />
+            </Form.Group>
+          </Col>
+        </Row>
 
-      <p>
-        <strong>Please Update Family Details</strong>
-      </p>
+        <p className="mt-3">Please Update Family Details</p>
+        <h5 className="mt-2 mb-3">Parent Details</h5>
 
-      {/* Parent Details */}
-      <h5 className="mt-3 mb-3">
-        <strong>Parent Details</strong>
-      </h5>
+        {/* Father Details */}
+        <Row className="mb-3">
+          <Col md={4}>
+            <Form.Group controlId="fatherName">
+              <Form.Label>Father Name</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Enter Father Name"
+                name="fatherName"
+                value={formData.fatherName}
+                onChange={handleChange}
+              />
+            </Form.Group>
+          </Col>
+          <Col md={4}>
+            <Form.Group controlId="fatherDob">
+              <Form.Label>Date of Birth</Form.Label>
+              <Form.Control type="date" name="fatherDob" value={formData.fatherDob} onChange={handleChange} />
+            </Form.Group>
+          </Col>
+          <Col md={4}>
+            <Form.Group controlId="fatherAadhar">
+              <Form.Label>Aadhaar Number</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Enter Aadhaar No"
+                name="fatherAadhar"
+                value={formData.fatherAadhar}
+                onChange={handleChange}
+              />
+            </Form.Group>
+          </Col>
+        </Row>
 
-      {/* Father Row */}
-      <Row>
-        <Col md={4}>
-          <Form.Group className="mb-3">
-            <Form.Control type="text" placeholder="Enter Father Name" />
-          </Form.Group>
-        </Col>
-        <Col md={4}>
-          <Form.Group className="mb-3">
-            <Form.Control type="date" />
-          </Form.Group>
-        </Col>
-        <Col md={4}>
-          <Form.Group className="mb-3">
-            <Form.Control type="text" placeholder="Enter Aadhaar No" />
-          </Form.Group>
-        </Col>
-      </Row>
+        <Row className="mb-3">
+          <Col md={4}>
+            <Form.Group controlId="fatherMobile">
+              <Form.Label>Mobile Number</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Enter Mobile Number"
+                name="fatherMobile"
+                value={formData.fatherMobile}
+                onChange={handleChange}
+              />
+            </Form.Group>
+          </Col>
+        </Row>
 
-      {/* Father Mobile */}
-      <Row>
-        <Col md={4}>
-          <Form.Group className="mb-3">
-            <Form.Control type="text" placeholder="Enter Mobile Number" />
-          </Form.Group>
-        </Col>
-      </Row>
+        {/* Mother Details */}
+        <Row className="mb-3">
+          <Col md={4}>
+            <Form.Group controlId="motherName">
+              <Form.Label>Mother Name</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Enter Mother Name"
+                name="motherName"
+                value={formData.motherName}
+                onChange={handleChange}
+              />
+            </Form.Group>
+          </Col>
+          <Col md={4}>
+            <Form.Group controlId="motherDob">
+              <Form.Label>Date of Birth</Form.Label>
+              <Form.Control type="date" name="motherDob" value={formData.motherDob} onChange={handleChange} />
+            </Form.Group>
+          </Col>
+          <Col md={4}>
+            <Form.Group controlId="motherAadhar">
+              <Form.Label>Aadhaar Number</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Enter Aadhaar No"
+                name="motherAadhar"
+                value={formData.motherAadhar}
+                onChange={handleChange}
+              />
+            </Form.Group>
+          </Col>
+        </Row>
 
-      {/* Mother Row */}
-      <Row>
-        <Col md={4}>
-          <Form.Group className="mb-3">
-            <Form.Control type="text" placeholder="Enter Mother Name" />
-          </Form.Group>
-        </Col>
-        <Col md={4}>
-          <Form.Group className="mb-3">
-            <Form.Control type="date" />
-          </Form.Group>
-        </Col>
-        <Col md={4}>
-          <Form.Group className="mb-3">
-            <Form.Control type="text" placeholder="Enter Aadhaar No" />
-          </Form.Group>
-        </Col>
-      </Row>
+        <Row className="mb-3">
+          <Col md={4}>
+            <Form.Group controlId="motherMobile">
+              <Form.Label>Mobile Number</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Enter Mobile Number"
+                name="motherMobile"
+                value={formData.motherMobile}
+                onChange={handleChange}
+              />
+            </Form.Group>
+          </Col>
+        </Row>
 
-      {/* Mother Mobile */}
-      <Row>
-        <Col md={4}>
-          <Form.Group className="mb-3">
-            <Form.Control type="text" placeholder="Enter Mobile Number" />
-          </Form.Group>
-        </Col>
-      </Row>
-
-      {/* Buttons */}
-      <div className="d-flex justify-content-center mt-4">
-        <Button variant="danger" className="me-3">
-          Cancel
-        </Button>
-        <Button variant="primary">Update</Button>
-      </div>
-    </Form>
+        {/* Action Buttons */}
+        <div className="d-flex justify-content-center mt-4">
+          <Button variant="danger" className="me-2" type="reset">
+            CANCEL
+          </Button>
+          <Button variant="primary" type="submit">
+            UPDATE
+          </Button>
+        </div>
+      </Form>
+    </div>
   );
-};
+}
 
 export default FamilyDetailsForm;

@@ -1,31 +1,47 @@
-.App {
-  text-align: center;
+
+
+* {
+  font-size: 14px;
+  font-family: "Roboto", Arial, sans-serif;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+label.form-label {
+  font-size: 14px !important;
+  color: #a7b2ca;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+::placeholder {
+  color: #99a3ad !important;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+/* For WebKit browsers (Chrome, Edge, Safari) */
+input[type="date"]::-webkit-datetime-edit,
+input[type="date"]::-webkit-datetime-edit-text,
+input[type="date"]::-webkit-datetime-edit-month-field,
+input[type="date"]::-webkit-datetime-edit-day-field,
+input[type="date"]::-webkit-datetime-edit-year-field {
+  color: #99a3ad;
 }
 
-.App-link {
-  color: #61dafb;
+/* When nothing is selected (empty value) */
+.placeholder-select {
+  color: #99a3ad !important; /* Same as other placeholder text */
+}
+
+/* Normal options (after selecting) */
+.placeholder-select option {
+  color: #000; /* Normal black text for selected values */
+}
+
+/* Placeholder */
+.placeholder-select {
+  color: #99a3ad !important;
+}
+
+/* Options inside dropdown */
+.placeholder-select option,
+.form-select option {
+  color: #99a3ad;   /* All dropdown options in grey */
 }
 
 @keyframes App-logo-spin {

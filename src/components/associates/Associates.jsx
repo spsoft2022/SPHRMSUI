@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import { useState } from "react";
+
+import AssociateDetails from "./associateDetails/AssociateDetails";
 import AssociateExitForm from "./associateExit/AssociateExitForm";
-import FamilyDetailsForm from "./familyDetails/FamilyDetailsForm";
+import "./Associates.css";
 import EducationDetails from "./educationDetails/EducationDetails";
 import EmploymentDetailsForm from "./employmentDetails/EmploymentDetailsForm";
-import RegistrationDetailsForm from "./registrationDetails/RegistrationDetailsForm";
+import FamilyDetailsForm from "./familyDetails/FamilyDetailsForm";
 import InitiationDetailsForm from "./InitiationDetails/InitiationDetailsForm";
-import AssociateDetails from "./associateDetails/AssociateDetails";
-
+import RegistrationDetailsForm from "./registrationDetails/RegistrationDetailsForm";
 const tabs = [
   { key: "associates", label: "Associates" },
   { key: "initiation", label: "Initiation" },
@@ -37,13 +38,13 @@ function Associates() {
 
       {/* Tab Content */}
       <div className="flex-grow-1 p-4 border rounded bg-white shadow-sm">
-        {activeTab === "associates" && <AssociateDetails/>}
-        {activeTab === "initiation" && <InitiationDetailsForm/>}
-        {activeTab === "registration" && <RegistrationDetailsForm/>}
-        {activeTab === "employment" && <EmploymentDetailsForm/>}
-        {activeTab === "education" && <EducationDetails/>}
-        {activeTab === "family" && <FamilyDetailsForm/>}
-        {activeTab === "exit" && <AssociateExitForm/>}
+        {activeTab === "associates" && <AssociateDetails />}
+        {activeTab === "initiation" && <InitiationDetailsForm />}
+        {activeTab === "registration" && <RegistrationDetailsForm />}
+        {activeTab === "employment" && <EmploymentDetailsForm />}
+        {activeTab === "education" && <EducationDetails />}
+        {activeTab === "family" && <FamilyDetailsForm />}
+        {activeTab === "exit" && <AssociateExitForm />}
       </div>
     </div>
   );

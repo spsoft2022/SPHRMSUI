@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Form, Button, Row, Col } from "react-bootstrap";
+import { useState } from "react";
+import { Button, Col, Form, Row } from "react-bootstrap";
 
 function InitiationDetailsForm() {
   const [formData, setFormData] = useState({
@@ -38,12 +38,12 @@ function InitiationDetailsForm() {
   };
 
   return (
-    <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+    <div>
       <h4 className="mb-3">Initiation Details</h4>
 
       <Form onSubmit={handleSubmit}>
         <Row>
-          <Col md={6}>
+          <Col md={4}>
             <Form.Group className="mb-3">
               <Form.Label>Associate No</Form.Label>
               <Form.Control
@@ -56,7 +56,7 @@ function InitiationDetailsForm() {
               />
             </Form.Group>
           </Col>
-          <Col md={6}>
+          <Col md={4}>
             <Form.Group className="mb-3">
               <Form.Label>Full Name</Form.Label>
               <Form.Control
@@ -69,22 +69,7 @@ function InitiationDetailsForm() {
               />
             </Form.Group>
           </Col>
-        </Row>
-
-        <Row>
-          <Col md={6}>
-            <Form.Group className="mb-3">
-              <Form.Label>Personal Email ID</Form.Label>
-              <Form.Control
-                type="email"
-                name="personalEmail"
-                value={formData.personalEmail}
-                onChange={handleChange}
-                placeholder="name@domain.com"
-              />
-            </Form.Group>
-          </Col>
-          <Col md={6}>
+          <Col md={4}>
             <Form.Group className="mb-3">
               <Form.Label>Company Email ID</Form.Label>
               <Form.Control
@@ -99,13 +84,31 @@ function InitiationDetailsForm() {
         </Row>
 
         <Row>
-          <Col md={3}>
+          <Col md={4}>
+            <Form.Group className="mb-3">
+              <Form.Label>Personal Email ID</Form.Label>
+              <Form.Control
+                type="email"
+                name="personalEmail"
+                value={formData.personalEmail}
+                onChange={handleChange}
+                placeholder="name@domain.com"
+              />
+            </Form.Group>
+          </Col>
+          <Col md={4}>
+            <Form.Group className="mb-3">
+              <Form.Label>Date of Birth</Form.Label>
+              <Form.Control type="date" name="dateOfBirth" value={formData.dateOfBirth} onChange={handleChange} />
+            </Form.Group>
+          </Col>
+          <Col md={4}>
             <Form.Group className="mb-3">
               <Form.Label>Gender</Form.Label>
-              <div>
+              <div className="mt-1">
                 <Form.Check
                   inline
-                  label="Male"
+                  label={<span className="custom-radio-label">Male</span>}
                   type="radio"
                   name="gender"
                   value="Male"
@@ -114,7 +117,7 @@ function InitiationDetailsForm() {
                 />
                 <Form.Check
                   inline
-                  label="Female"
+                  label={<span className="custom-radio-label">Female</span>}
                   type="radio"
                   name="gender"
                   value="Female"
@@ -124,35 +127,41 @@ function InitiationDetailsForm() {
               </div>
             </Form.Group>
           </Col>
-          <Col md={3}>
-            <Form.Group className="mb-3">
-              <Form.Label>Date of Birth</Form.Label>
-              <Form.Control
-                type="date"
-                name="dateOfBirth"
-                value={formData.dateOfBirth}
-                onChange={handleChange}
-              />
-            </Form.Group>
-          </Col>
-          <Col md={3}>
+        </Row>
+
+        <Row>
+          <Col md={4}>
             <Form.Group className="mb-3">
               <Form.Label>Date of Joining</Form.Label>
-              <Form.Control
-                type="date"
-                name="dateOfJoining"
-                value={formData.dateOfJoining}
-                onChange={handleChange}
-              />
+              <Form.Control type="date" name="dateOfJoining" value={formData.dateOfJoining} onChange={handleChange} />
             </Form.Group>
           </Col>
-          <Col md={3}>
+          <Col md={4}>
+            <Form.Group className="mb-3">
+              <Form.Label>Role</Form.Label>
+              <Form.Select
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+                className={formData.role === "" ? "placeholder-select" : ""}
+                required
+              >
+                <option value="" disabled>
+                  Select Role
+                </option>
+                <option value="Developer">Developer</option>
+                <option value="Manager">Manager</option>
+                <option value="Tester">Tester</option>
+              </Form.Select>
+            </Form.Group>
+          </Col>
+          <Col md={4}>
             <Form.Group className="mb-3">
               <Form.Label>Current Status</Form.Label>
-              <div>
+              <div className="mt-1">
                 <Form.Check
                   inline
-                  label="Active"
+                  label={<span className="custom-radio-label">Active</span>}
                   type="radio"
                   name="currentStatus"
                   value="Active"
@@ -161,7 +170,7 @@ function InitiationDetailsForm() {
                 />
                 <Form.Check
                   inline
-                  label="Inactive"
+                  label={<span className="custom-radio-label">Inactive</span>}
                   type="radio"
                   name="currentStatus"
                   value="Inactive"
@@ -174,21 +183,6 @@ function InitiationDetailsForm() {
         </Row>
 
         <Row>
-          <Col md={4}>
-            <Form.Group className="mb-3">
-              <Form.Label>Role</Form.Label>
-              <Form.Select
-                name="role"
-                value={formData.role}
-                onChange={handleChange}
-              >
-                <option value="">Select Role</option>
-                <option value="Developer">Developer</option>
-                <option value="Manager">Manager</option>
-                <option value="Tester">Tester</option>
-              </Form.Select>
-            </Form.Group>
-          </Col>
           <Col md={4}>
             <Form.Group className="mb-3">
               <Form.Label>Joining Designation</Form.Label>
@@ -213,9 +207,6 @@ function InitiationDetailsForm() {
               />
             </Form.Group>
           </Col>
-        </Row>
-
-        <Row>
           <Col md={4}>
             <Form.Group className="mb-3">
               <Form.Label>Employment Type</Form.Label>
@@ -223,14 +214,20 @@ function InitiationDetailsForm() {
                 name="employmentType"
                 value={formData.employmentType}
                 onChange={handleChange}
+                className={formData.employmentType === "" ? "placeholder-select" : ""}
               >
-                <option value="">Select Employment Type</option>
+                <option value="" disabled>
+                  Select Employment Type
+                </option>
                 <option value="Permanent">Permanent</option>
                 <option value="Contract">Contract</option>
                 <option value="Intern">Intern</option>
               </Form.Select>
             </Form.Group>
           </Col>
+        </Row>
+
+        <Row>
           <Col md={4}>
             <Form.Group className="mb-3">
               <Form.Label>Department</Form.Label>
@@ -238,14 +235,18 @@ function InitiationDetailsForm() {
                 name="department"
                 value={formData.department}
                 onChange={handleChange}
+                className={formData.department === "" ? "placeholder-select" : ""}
               >
-                <option value="">Select Department</option>
+                <option value="" disabled>
+                  Select Department
+                </option>
                 <option value="HR">HR</option>
                 <option value="IT">IT</option>
                 <option value="Finance">Finance</option>
               </Form.Select>
             </Form.Group>
           </Col>
+
           <Col md={4}>
             <Form.Group className="mb-3">
               <Form.Label>Reporting Associate</Form.Label>
@@ -253,17 +254,17 @@ function InitiationDetailsForm() {
                 name="reportingAssociate"
                 value={formData.reportingAssociate}
                 onChange={handleChange}
+                className={formData.reportingAssociate === "" ? "placeholder-select" : ""}
               >
-                <option value="">Select Reporting Associate</option>
+                <option value="" disabled>
+                  Select Reporting Associate
+                </option>
                 <option value="A001">A001</option>
                 <option value="A002">A002</option>
               </Form.Select>
             </Form.Group>
           </Col>
-        </Row>
-
-        <Row>
-          <Col md={6}>
+          <Col md={4}>
             <Form.Group className="mb-3">
               <Form.Label>Client</Form.Label>
               <Form.Control
@@ -275,7 +276,10 @@ function InitiationDetailsForm() {
               />
             </Form.Group>
           </Col>
-          <Col md={6}>
+        </Row>
+
+        <Row>
+          <Col md={4}>
             <Form.Group className="mb-3">
               <Form.Label>Head Office</Form.Label>
               <Form.Control
@@ -287,16 +291,13 @@ function InitiationDetailsForm() {
               />
             </Form.Group>
           </Col>
-        </Row>
-
-        <Row>
-          <Col md={12}>
+          <Col md={4}>
             <Form.Group className="mb-3">
               <Form.Label>Select</Form.Label>
-              <div>
+              <div className="mt-1">
                 <Form.Check
                   inline
-                  label="LMS"
+                  label={<span className="custom-checkbox-label">LMS</span>}
                   type="checkbox"
                   name="lms"
                   checked={formData.lms}
@@ -304,7 +305,7 @@ function InitiationDetailsForm() {
                 />
                 <Form.Check
                   inline
-                  label="RMS"
+                  label={<span className="custom-checkbox-label">RMS</span>}
                   type="checkbox"
                   name="rms"
                   checked={formData.rms}
@@ -312,7 +313,7 @@ function InitiationDetailsForm() {
                 />
                 <Form.Check
                   inline
-                  label="HRMS"
+                  label={<span className="custom-checkbox-label">HRMS</span>}
                   type="checkbox"
                   name="hrms"
                   checked={formData.hrms}
@@ -323,8 +324,8 @@ function InitiationDetailsForm() {
           </Col>
         </Row>
 
-        <div className="d-flex justify-content-between mt-3">
-          <Button type="reset" variant="danger">
+        <div className="d-flex justify-content-center mt-4">
+          <Button type="reset" variant="danger" className="me-2">
             RESET
           </Button>
           <Button type="submit" variant="primary">

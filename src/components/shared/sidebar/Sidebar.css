@@ -16,11 +16,10 @@
 
 /* Sidebar button styling */
 .toggle-btn {
-  
   font-size: 1.5rem;
   width: 40px;
   height: 40px;
- color: #1c3f614b;
+  color: #1c3f614b;
 }
 
 .toggle-btn:hover {
@@ -47,4 +46,11 @@
 
 .app-sidebar.collapsed .nav-link span {
   display: none; /* hide text in collapsed */
+}
+
+/* Sidebar text font size */
+.app-sidebar .nav-link span {
+  font-size: 16px;
+  font-family: "Roboto", Arial, sans-serif;
+  font-weight: 500;
 }
