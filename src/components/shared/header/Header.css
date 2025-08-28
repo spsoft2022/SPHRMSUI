@@ -1,6 +1,6 @@
 /* Header Styles */
 .app-header {
-  background: linear-gradient(to bottom, #65327c, #3a4696); /* Violet top to blue bottom */
+  background:  #0a033dd1; /* Violet top to blue bottom */
   color: white;
   display: flex;
   justify-content: space-between;

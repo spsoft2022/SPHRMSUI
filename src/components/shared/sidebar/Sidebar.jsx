@@ -10,22 +10,25 @@ export default function Sidebar() {
 
   return (
     <div
-      className={`app-sidebar d-flex flex-column p-3 ${isExpanded ? "expanded" : "collapsed"}`}
-      onMouseEnter={() => setIsExpanded(true)}
-      onMouseLeave={() => setIsExpanded(false)}
+      className={`app-sidebar d-flex flex-column p-3 ${
+        isExpanded ? "expanded" : "collapsed"
+      }`}
     >
-      <button className="btn mb-3 toggle-btn" onClick={() => setIsExpanded(!isExpanded)}>
+      <button
+        className="btn mb-3 toggle-btn"
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
         <FaBars />
       </button>
 
       <ul className="nav flex-column mt-2">
-        <li className="nav-item ">
+        <li className="nav-item">
           <Link to="/associates" className="nav-link d-flex align-items-center ">
             <i className="fas fa-users me-2 py-2"></i>
             {isExpanded && <span>Associates</span>}
           </Link>
         </li>
-        <li className="nav-item ">
+        <li className="nav-item">
           <Link to="/employee" className="nav-link d-flex align-items-center ">
             <i className="fas fa-users me-2 py-2"></i>
             {isExpanded && <span>Employees</span>}
