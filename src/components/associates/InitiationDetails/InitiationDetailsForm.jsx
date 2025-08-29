@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button, Col, Form, Row } from "react-bootstrap";
+import axios from "axios";
 
+// This component handles the initiation details form.
 function InitiationDetailsForm() {
   const [formData, setFormData] = useState({
     associateNo: "",
@@ -11,7 +13,7 @@ function InitiationDetailsForm() {
     dateOfBirth: "",
     dateOfJoining: "",
     role: "",
-    joiningDesignation: "",
+    joiningDesignation: "", // This will now be populated from the API
     joiningCTC: "",
     currentStatus: "Active",
     employmentType: "",
@@ -23,6 +25,24 @@ function InitiationDetailsForm() {
     rms: false,
     hrms: false,
   });
+
+  // State to store the fetched designations
+  const [designations, setDesignations] = useState([]);
+
+  // Use useEffect to fetch designations when the component mounts
+  useEffect(() => {
+    const fetchDesignations = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/designations/allDesignations");
+        setDesignations(response.data.result);
+        console.log("Fetched designations:", response.data.result);
+      } catch (error) {
+        console.error("Error fetching designations:", error);
+      }
+    };
+
+    fetchDesignations();
+  }, []); // The empty array ensures this runs only once
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -186,13 +206,21 @@ function InitiationDetailsForm() {
           <Col md={4}>
             <Form.Group className="mb-3">
               <Form.Label>Joining Designation</Form.Label>
-              <Form.Control
-                type="text"
+              <Form.Select
                 name="joiningDesignation"
                 value={formData.joiningDesignation}
                 onChange={handleChange}
-                placeholder="Enter Designation"
-              />
+                className={formData.joiningDesignation === "" ? "placeholder-select" : ""}
+              >
+                <option value="" disabled>
+                  Select Designation
+                </option>
+                {designations.map((designation) => (
+                  <option key={designation.designationId} value={designation.name}>
+                    {designation.name}
+                  </option>
+                ))}
+              </Form.Select>
             </Form.Group>
           </Col>
           <Col md={4}>
