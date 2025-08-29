@@ -41,7 +41,7 @@
 
 .nav-link:hover {
   background-color: #d3d3d3; /* trendy hover color */
-  color: #408ead;
+  /* color: #408ead; */
 }
 
 .app-sidebar.collapsed .nav-link span {

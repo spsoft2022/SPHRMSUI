@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
-import { Button, Col, Form, Row } from "react-bootstrap";
 import axios from "axios";
+import { useEffect, useState } from "react";
+import { Button, Col, Form, Row } from "react-bootstrap";
 
 // This component handles the initiation details form.
 function InitiationDetailsForm() {
@@ -32,24 +32,47 @@ function InitiationDetailsForm() {
   // State to store the fetched departments
   const [departments, setDepartments] = useState([]);
 
+  const [sites, setSites] = useState([]);
 
+  // Fetch site data
+  useEffect(() => {
+    console.log("Fetching site data...");
+    axios
+      .get("http://localhost:5000/associates/sites")
+      .then((res) => {
+        const siteList = res.data.result;
+        setSites(siteList);
 
+        const updatedFormData = { ...formData };
+        siteList.forEach((site) => {
+          const key = site.siteName.toLowerCase();
+          updatedFormData[key] = site.status;
+        });
+        setFormData(updatedFormData);
+      })
+      .catch((err) => {
+        console.error("Error fetching site data:", err);
+      });
+  }, []);
+
+  // Fetch department list
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/departments")
+      .get("http://localhost:5000/associates/departments")
       .then((res) => {
-        console.log("Departments fetched:", res.data.data); // ✅ Now this will log the array
+        console.log("Departments fetched:", res.data.data); // Now this will log the array
         setDepartments(res.data.data || []);
       })
       .catch((err) => {
         console.error("Error fetching departments:", err);
       });
   }, []);
-  // Use useEffect to fetch designations when the component mounts
+
+  // Use useEffect to fetch designations data
   useEffect(() => {
     const fetchDesignations = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/designations/allDesignations");
+        const response = await axios.get("http://localhost:5000/associates/designations");
         setDesignations(response.data.result);
         console.log("Fetched designations:", response.data.result);
       } catch (error) {
@@ -58,7 +81,7 @@ function InitiationDetailsForm() {
     };
 
     fetchDesignations();
-  }, []); // The empty array ensures this runs only once
+  }, []);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -341,30 +364,20 @@ function InitiationDetailsForm() {
             <Form.Group className="mb-3">
               <Form.Label>Select</Form.Label>
               <div className="mt-1">
-                <Form.Check
-                  inline
-                  label={<span className="custom-checkbox-label">LMS</span>}
-                  type="checkbox"
-                  name="lms"
-                  checked={formData.lms}
-                  onChange={handleChange}
-                />
-                <Form.Check
-                  inline
-                  label={<span className="custom-checkbox-label">RMS</span>}
-                  type="checkbox"
-                  name="rms"
-                  checked={formData.rms}
-                  onChange={handleChange}
-                />
-                <Form.Check
-                  inline
-                  label={<span className="custom-checkbox-label">HRMS</span>}
-                  type="checkbox"
-                  name="hrms"
-                  checked={formData.hrms}
-                  onChange={handleChange}
-                />
+                {sites.map((site) => {
+                  const key = site.siteName.toLowerCase();
+                  return (
+                    <Form.Check
+                      key={site.siteId}
+                      inline
+                      label={<span className="custom-checkbox-label">{site.siteName}</span>}
+                      type="checkbox"
+                      name={key}
+                      checked={formData[key] || false}
+                      onChange={handleChange}
+                    />
+                  );
+                })}
               </div>
             </Form.Group>
           </Col>
