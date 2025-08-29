@@ -29,6 +29,22 @@ function InitiationDetailsForm() {
   // State to store the fetched designations
   const [designations, setDesignations] = useState([]);
 
+  // State to store the fetched departments
+  const [departments, setDepartments] = useState([]);
+
+
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/api/departments")
+      .then((res) => {
+        console.log("Departments fetched:", res.data.data); // ✅ Now this will log the array
+        setDepartments(res.data.data || []);
+      })
+      .catch((err) => {
+        console.error("Error fetching departments:", err);
+      });
+  }, []);
   // Use useEffect to fetch designations when the component mounts
   useEffect(() => {
     const fetchDesignations = async () => {
@@ -268,9 +284,11 @@ function InitiationDetailsForm() {
                 <option value="" disabled>
                   Select Department
                 </option>
-                <option value="HR">HR</option>
-                <option value="IT">IT</option>
-                <option value="Finance">Finance</option>
+                {departments.map((dept, index) => (
+                  <option key={index} value={dept.name}>
+                    {dept.name}
+                  </option>
+                ))}
               </Form.Select>
             </Form.Group>
           </Col>
