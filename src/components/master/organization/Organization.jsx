@@ -1,32 +1,35 @@
-import React from "react";
-
+import React, { useEffect, useState } from "react";
+import CustomTable from "../../shared/customtable/CustomTable";
 function Organization() {
-  const columns = [
-    "Organization Id",
-    "Organization Name",
-    "Establishment Date",
-    "Address",
-  ];
+  const [data, setData] = useState([]);
+  const [columns, setColumns] = useState([
+    "orgId",
+    "name",
+    "establishmentDate",
+    "address",
+  ]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/associates/organizations"); // backend API
+        const result = await response.json();
+
+        if (!result.isError && Array.isArray(result.result)) {
+          setData(result.result);
+        }
+      } catch (error) {
+        console.error("Error fetching organizations:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <div className="container mt-3">
       <h3>Organization</h3>
-      <table className="table table-bordered table-striped">
-        <thead>
-          <tr>
-            {columns.map((col, index) => (
-              <th key={index}>{col}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td colSpan={columns.length} className="text-center">
-              No Data Available
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <CustomTable columns={columns} data={data} />
     </div>
   );
 }
