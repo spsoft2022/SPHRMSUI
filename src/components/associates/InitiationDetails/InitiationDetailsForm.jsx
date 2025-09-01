@@ -31,6 +31,10 @@ function InitiationDetailsForm() {
 
   // State to store the fetched departments
   const [departments, setDepartments] = useState([]);
+  const [clients, setClients] = useState([]);
+
+  // State to store the fetched head offices
+  const [headOffices, setHeadOffices] = useState([]);
 
   const [sites, setSites] = useState([]);
 
@@ -157,12 +161,6 @@ function InitiationDetailsForm() {
           </Col>
           <Col md={4}>
             <Form.Group className="mb-3">
-              <Form.Label>Date of Birth</Form.Label>
-              <Form.Control type="date" name="dateOfBirth" value={formData.dateOfBirth} onChange={handleChange} />
-            </Form.Group>
-          </Col>
-          <Col md={4}>
-            <Form.Group className="mb-3">
               <Form.Label>Gender</Form.Label>
               <div className="mt-1">
                 <Form.Check
@@ -186,6 +184,12 @@ function InitiationDetailsForm() {
               </div>
             </Form.Group>
           </Col>
+          <Col md={4}>
+            <Form.Group className="mb-3">
+              <Form.Label>Date of Birth</Form.Label>
+              <Form.Control type="date" name="dateOfBirth" value={formData.dateOfBirth} onChange={handleChange} />
+            </Form.Group>
+          </Col>
         </Row>
 
         <Row>
@@ -193,25 +197,6 @@ function InitiationDetailsForm() {
             <Form.Group className="mb-3">
               <Form.Label>Date of Joining</Form.Label>
               <Form.Control type="date" name="dateOfJoining" value={formData.dateOfJoining} onChange={handleChange} />
-            </Form.Group>
-          </Col>
-          <Col md={4}>
-            <Form.Group className="mb-3">
-              <Form.Label>Role</Form.Label>
-              <Form.Select
-                name="role"
-                value={formData.role}
-                onChange={handleChange}
-                className={formData.role === "" ? "placeholder-select" : ""}
-                required
-              >
-                <option value="" disabled>
-                  Select Role
-                </option>
-                <option value="Developer">Developer</option>
-                <option value="Manager">Manager</option>
-                <option value="Tester">Tester</option>
-              </Form.Select>
             </Form.Group>
           </Col>
           <Col md={4}>
@@ -239,41 +224,6 @@ function InitiationDetailsForm() {
               </div>
             </Form.Group>
           </Col>
-        </Row>
-
-        <Row>
-          <Col md={4}>
-            <Form.Group className="mb-3">
-              <Form.Label>Joining Designation</Form.Label>
-              <Form.Select
-                name="joiningDesignation"
-                value={formData.joiningDesignation}
-                onChange={handleChange}
-                className={formData.joiningDesignation === "" ? "placeholder-select" : ""}
-              >
-                <option value="" disabled>
-                  Select Designation
-                </option>
-                {designations.map((designation) => (
-                  <option key={designation.designationId} value={designation.name}>
-                    {designation.name}
-                  </option>
-                ))}
-              </Form.Select>
-            </Form.Group>
-          </Col>
-          <Col md={4}>
-            <Form.Group className="mb-3">
-              <Form.Label>Joining CTC</Form.Label>
-              <Form.Control
-                type="text"
-                name="joiningCTC"
-                value={formData.joiningCTC}
-                onChange={handleChange}
-                placeholder="Enter Joining CTC"
-              />
-            </Form.Group>
-          </Col>
           <Col md={4}>
             <Form.Group className="mb-3">
               <Form.Label>Employment Type</Form.Label>
@@ -295,6 +245,25 @@ function InitiationDetailsForm() {
         </Row>
 
         <Row>
+          <Col md={4}>
+            <Form.Group className="mb-3">
+              <Form.Label>Role</Form.Label>
+              <Form.Select
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+                className={formData.role === "" ? "placeholder-select" : ""}
+                required
+              >
+                <option value="" disabled>
+                  Select Role
+                </option>
+                <option value="Developer">Developer</option>
+                <option value="Manager">Manager</option>
+                <option value="Tester">Tester</option>
+              </Form.Select>
+            </Form.Group>
+          </Col>
           <Col md={4}>
             <Form.Group className="mb-3">
               <Form.Label>Department</Form.Label>
@@ -333,16 +302,68 @@ function InitiationDetailsForm() {
               </Form.Select>
             </Form.Group>
           </Col>
+        </Row>
+
+        <Row>
+          <Col md={4}>
+            <Form.Group className="mb-3">
+              <Form.Label>Joining Designation</Form.Label>
+              <Form.Select
+                name="joiningDesignation"
+                value={formData.joiningDesignation}
+                onChange={handleChange}
+                className={formData.joiningDesignation === "" ? "placeholder-select" : ""}
+              >
+                <option value="" disabled>
+                  Select Designation
+                </option>
+                {designations.map((designation) => (
+                  <option key={designation.designationId} value={designation.name}>
+                    {designation.name}
+                  </option>
+                ))}
+              </Form.Select>
+            </Form.Group>
+          </Col>
+
           <Col md={4}>
             <Form.Group className="mb-3">
               <Form.Label>Client</Form.Label>
-              <Form.Control
-                type="text"
+              <Form.Select
                 name="client"
                 value={formData.client}
                 onChange={handleChange}
-                placeholder="Enter Client Name"
-              />
+                className={formData.client === "" ? "placeholder-select" : ""}
+              >
+                <option value="" disabled>
+                  Select Client
+                </option>
+                {clients.map((client, index) => (
+                  <option key={index} value={client.name}>
+                    {client.name}
+                  </option>
+                ))}
+              </Form.Select>
+            </Form.Group>
+          </Col>
+          <Col md={4}>
+            <Form.Group className="mb-3">
+              <Form.Label>Head Office</Form.Label>
+              <Form.Select
+                name="headOffice"
+                value={formData.headOffice}
+                onChange={handleChange}
+                className={formData.headOffice === "" ? "placeholder-select" : ""}
+              >
+                <option value="" disabled>
+                  Select Head Office
+                </option>
+                {headOffices.map((office, index) => (
+                  <option key={index} value={office.name}>
+                    {office.name}
+                  </option>
+                ))}
+              </Form.Select>
             </Form.Group>
           </Col>
         </Row>
@@ -350,13 +371,13 @@ function InitiationDetailsForm() {
         <Row>
           <Col md={4}>
             <Form.Group className="mb-3">
-              <Form.Label>Head Office</Form.Label>
+              <Form.Label>Joining CTC</Form.Label>
               <Form.Control
                 type="text"
-                name="headOffice"
-                value={formData.headOffice}
+                name="joiningCTC"
+                value={formData.joiningCTC}
                 onChange={handleChange}
-                placeholder="Enter Head Office"
+                placeholder="Enter Joining CTC"
               />
             </Form.Group>
           </Col>
