@@ -1,18 +1,30 @@
-import { useState } from "react";
-import { FaEdit } from "react-icons/fa"; // Edit icon
+import React, { useState } from "react";
+import "./CustomTable.css";
+import { FaEdit } from "react-icons/fa";
 
 function CustomTable({ columns = [], data = [], onEdit }) {
   const [search, setSearch] = useState("");
-
-  // Normalize columns (support both string & object)
+  const [currentPage, setCurrentPage] = useState(1);
+  const recordsPerPage = 10;
   const normalizedColumns = columns.map((col) => (typeof col === "string" ? { field: col, label: col } : col));
-
   // Filter rows based on search text
   const filteredData = data.filter((row) =>
     normalizedColumns.some((col) => row[col.field]?.toString().toLowerCase().includes(search.toLowerCase()))
   );
-
   const showAction = typeof onEdit === "function";
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredData.length / recordsPerPage);
+  const indexOfLastRecord = currentPage * recordsPerPage;
+  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+  const currentRecords = filteredData.slice(indexOfFirstRecord, indexOfLastRecord);
+
+  // Change page
+  const goToPage = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
 
   return (
     <div>
@@ -23,7 +35,10 @@ function CustomTable({ columns = [], data = [], onEdit }) {
           className="form-control w-auto"
           placeholder="Search..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setCurrentPage(1); // reset to first page after search
+          }}
         />
       </div>
 
@@ -47,7 +62,7 @@ function CustomTable({ columns = [], data = [], onEdit }) {
               </td>
             </tr>
           ) : (
-            filteredData.map((row, rowIndex) => (
+            currentRecords.map((row, rowIndex) => (
               <tr key={rowIndex}>
                 {normalizedColumns.map((col, colIndex) => (
                   <td key={colIndex}>{row[col.field]}</td>
@@ -55,8 +70,8 @@ function CustomTable({ columns = [], data = [], onEdit }) {
                 {showAction && (
                   <td className="text-center">
                     <i
-                      className="fas fa-edit text-primary"
-                      style={{ cursor: "pointer" }}
+                      className="fas fa-edit"
+                      style={{ cursor: "pointer",color:"#2199e8" }}
                       onClick={() => onEdit(row)}
                     ></i>
                   </td>
@@ -66,8 +81,51 @@ function CustomTable({ columns = [], data = [], onEdit }) {
           )}
         </tbody>
       </table>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="d-flex justify-content-center mt-3">
+          <ul className="pagination">
+            {/* Previous Button */}
+            <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+              <button className="page-link" onClick={() => goToPage(currentPage - 1)}>
+                « Previous
+              </button>
+            </li>
+
+            {/* Show only 4 page numbers at a time */}
+            {(() => {
+              const maxVisible = 4;
+              const startPage = Math.floor((currentPage - 1) / maxVisible) * maxVisible + 1;
+              const endPage = Math.min(startPage + maxVisible - 1, totalPages);
+
+              return [...Array(endPage - startPage + 1)].map((_, index) => {
+                const pageNumber = startPage + index;
+                return (
+                  <li
+                    key={pageNumber}
+                    className={`page-item ${currentPage === pageNumber ? "active" : ""}`}
+                  >
+                    <button className="page-link" onClick={() => goToPage(pageNumber)}>
+                      {pageNumber}
+                    </button>
+                  </li>
+                );
+              });
+            })()}
+
+            {/* Next Button */}
+            <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+              <button className="page-link" onClick={() => goToPage(currentPage + 1)}>
+                Next »
+              </button>
+            </li>
+          </ul>
+        </div>
+      )}
     </div>
   );
 }
 
 export default CustomTable;
+

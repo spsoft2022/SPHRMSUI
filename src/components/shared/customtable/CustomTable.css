@@ -1,0 +1,16 @@
+.custom-thead {
+  background-color: #f2f2f2;
+}
+
+.pagination .page-link {
+  border: none;
+  background: none;
+  color:black
+}
+
+.pagination .active .page-link {
+  font-weight: bold;
+  background-color: #2199e8;
+  color: #ffff;
+}
+
