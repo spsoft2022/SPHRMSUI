@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import "./CustomTable.css";
-import { FaEdit } from "react-icons/fa";
+import { useState } from "react";
 
-function CustomTable({ columns = [], data = [], onEdit }) {
+import "./CustomTable.css";
+
+function CustomTable({ columns = [], data = [], onEdit, extraAction }) {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const recordsPerPage = 10;
@@ -29,7 +29,8 @@ function CustomTable({ columns = [], data = [], onEdit }) {
   return (
     <div>
       {/* Header row with search bar aligned right */}
-      <div className="d-flex justify-content-end mb-2">
+      {/* Header row with search bar aligned right and icon */}
+      <div className="d-flex justify-content-end mb-2 align-items-center">
         <input
           type="text"
           className="form-control w-auto"
@@ -40,6 +41,9 @@ function CustomTable({ columns = [], data = [], onEdit }) {
             setCurrentPage(1); // reset to first page after search
           }}
         />
+
+        {/* User Plus Icon */}
+        {extraAction && <div className="ms-2">{extraAction}</div>}
       </div>
 
       {/* Table */}
@@ -71,7 +75,7 @@ function CustomTable({ columns = [], data = [], onEdit }) {
                   <td className="text-center">
                     <i
                       className="fas fa-edit"
-                      style={{ cursor: "pointer",color:"#2199e8" }}
+                      style={{ cursor: "pointer", color: "#2199e8" }}
                       onClick={() => onEdit(row)}
                     ></i>
                   </td>
@@ -102,10 +106,7 @@ function CustomTable({ columns = [], data = [], onEdit }) {
               return [...Array(endPage - startPage + 1)].map((_, index) => {
                 const pageNumber = startPage + index;
                 return (
-                  <li
-                    key={pageNumber}
-                    className={`page-item ${currentPage === pageNumber ? "active" : ""}`}
-                  >
+                  <li key={pageNumber} className={`page-item ${currentPage === pageNumber ? "active" : ""}`}>
                     <button className="page-link" onClick={() => goToPage(pageNumber)}>
                       {pageNumber}
                     </button>
@@ -128,4 +129,3 @@ function CustomTable({ columns = [], data = [], onEdit }) {
 }
 
 export default CustomTable;
-
