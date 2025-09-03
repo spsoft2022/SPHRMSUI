@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+
 import CustomTable from "../../shared/customtable/CustomTable";
 
 function Department() {
@@ -124,7 +125,7 @@ function Department() {
           columns={columns}
           data={data}
           onEdit={handleEdit}
-          extraAction={
+          createAction={
             <i
               className="fa-solid fa-user-plus p-2 rounded-3"
               style={{
