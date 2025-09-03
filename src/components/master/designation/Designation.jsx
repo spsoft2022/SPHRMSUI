@@ -10,8 +10,8 @@ function Designation() {
 
   const columns = [
     { field: "designationId", label: "Designation Id" },
-    { field: "name", label: "Designation Name" },
     { field: "code", label: "Designation Code" },
+    { field: "name", label: "Designation Name" },
   ];
 
   // Fetch all data
@@ -101,7 +101,7 @@ function Designation() {
           columns={columns}
           data={data}
           onEdit={handleEdit}
-          extraAction={
+          createAction={
             <i
               className="fa-solid fa-user-plus p-2 rounded-3"
               style={{

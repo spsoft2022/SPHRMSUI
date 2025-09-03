@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import "./CustomTable.css";
 
-function CustomTable({ columns = [], data = [], onEdit, extraAction }) {
+function CustomTable({ columns = [], data = [], onEdit, createAction }) {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const recordsPerPage = 10;
@@ -43,7 +43,7 @@ function CustomTable({ columns = [], data = [], onEdit, extraAction }) {
         />
 
         {/* User Plus Icon */}
-        {extraAction && <div className="ms-2">{extraAction}</div>}
+        {createAction && <div className="ms-2">{createAction}</div>}
       </div>
 
       {/* Table */}
