@@ -11,11 +11,11 @@ function AssociateReporting() {
   });
 
   // Fetch departments
-useEffect(() => {
+  useEffect(() => {
     axios
       .get("http://localhost:5000/associates/departments")
       .then((res) => {
-        console.log("Departments fetched:", res.data.data); 
+        console.log("Departments fetched:", res.data.data);
         setDepartments(res.data.data || []);
       })
       .catch((err) => {
@@ -23,22 +23,38 @@ useEffect(() => {
       });
   }, []);
 
-  // Fetch department heads
-  // useEffect(() => {
-  //   axios
-  //     .get("http://localhost:5000/api/department-heads")
-  //     .then((res) => {
-  //       setDepartmentHeads(res.data.data || []);
-  //     })
-  //     .catch((err) => console.error("Error fetching department heads:", err));
-  // }, []);
 
-  const handleChange = (e) => {
+  const handleChange = async (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+
+    if (name === "departmentName") {
+      setFormData({ ...formData, departmentName: value });
+
+      // find selected department
+      const selectedDept = departments.find((dept) => dept.name === value);
+
+      if (selectedDept) {
+        try {
+          // Call backend to get department by id (not associates)
+          const res = await axios.get(
+            `http://localhost:5000/associates/departments/${selectedDept.deptId}`
+          );
+
+          if (!res.data.isError && res.data.result) {
+            const dept = res.data.result;
+
+            setFormData((prev) => ({
+              ...prev,
+              departmentHead: dept.departmentHead || "N/A", 
+            }));
+          }
+        } catch (err) {
+          console.error("Error fetching department by id:", err);
+        }
+      }
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleSubmit = (e) => {
@@ -73,27 +89,21 @@ useEffect(() => {
           <Col md={4}>
             <Form.Group className="mb-3">
               <Form.Label>Department Head</Form.Label>
-              <Form.Select
+              <Form.Control
+                type="text"
                 name="departmentHead"
                 value={formData.departmentHead}
-                onChange={handleChange}
-              >
-                <option value="" disabled>
-                  Select Department Head
-                </option>
-                {departmentHeads.map((head, index) => (
-                  <option key={index} value={head.name}>
-                    {head.name}
-                  </option>
-                ))}
-              </Form.Select>
+                readOnly
+              />
             </Form.Group>
           </Col>
+
+
         </Row>
 
         {/* Centered CREATE button */}
         <div className="d-flex justify-content-center mt-3">
-          <Button type="submit" variant="primary">
+          <Button type="submit" variant="primary"  >
             CREATE
           </Button>
         </div>

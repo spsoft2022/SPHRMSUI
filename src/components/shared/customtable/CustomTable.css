@@ -14,3 +14,11 @@
   color: #ffff;
 }
 
+.sort-icon {
+  font-size: 0.7rem;      /* smaller size */
+  color: #adb5bd;         /* light gray (inactive) */
+}
+ 
+.sort-icon.active {
+  color: #6c757d;         /* darker gray (active column) */
+}
