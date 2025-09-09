@@ -44,6 +44,11 @@ input[type="date"]::-webkit-datetime-edit-year-field {
   color: #99a3ad;   /* All dropdown options in grey */
 }
 
+.disabled-option {
+  background-color: #f0f0f0 !important;
+  color: #a0a0a0 !important;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

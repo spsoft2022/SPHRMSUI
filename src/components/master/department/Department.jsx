@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import CustomTable from "../../shared/customtable/CustomTable";
 
@@ -80,11 +82,13 @@ function Department() {
       if (!result.isError) {
         await fetchAllDepartments();
         setEditingRow(null);
+        toast.success("Department updated successfully!");
       } else {
-        alert(result.message);
+        toast.error(result.message || "Failed to update department.");
       }
     } catch (error) {
       console.error("Error updating department:", error);
+      toast.error("Something went wrong while updating!");
     }
   };
 
@@ -102,11 +106,13 @@ function Department() {
       if (!result.isError) {
         await fetchAllDepartments();
         handleCancel();
+        toast.success("Department created successfully!");
       } else {
-        alert(result.message);
+        toast.error(result.message || "Failed to create department.");
       }
     } catch (error) {
       console.error("Error creating department:", error);
+      toast.error("Something went wrong while creating!");
     }
   };
 

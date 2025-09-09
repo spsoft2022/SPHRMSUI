@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import CustomTable from "../../shared/customtable/CustomTable";
 
@@ -59,37 +61,40 @@ function Designation() {
       if (!result.isError) {
         setEditingRow(null);
         await fetchAll();
+        toast.success("Designation updated successfully!");
       } else {
-        alert(result.message);
+        toast.error(result.message || "Failed to update designation.");
       }
     } catch (error) {
       console.error("Error updating designation:", error);
+      toast.error("Something went wrong while updating!");
     }
   };
 
   // Create a new designation by sending POST request with new data
   const handleCreate = async () => {
-  try {
-    const response = await fetch("http://localhost:5000/associates/add", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(editingRow),
-    });
+    try {
+      const response = await fetch("http://localhost:5000/associates/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editingRow),
+      });
 
-    const result = await response.json();
+      const result = await response.json();
 
-    if (!result.isError) {
-      setIsAdding(false);
-      setEditingRow(null);
-      await fetchAll();
-    } else {
-      alert(result.message);
+      if (!result.isError) {
+        setIsAdding(false);
+        setEditingRow(null);
+        await fetchAll();
+        toast.success("Designation created successfully!");
+      } else {
+        toast.error(result.message || "Failed to create designation.");
+      }
+    } catch (error) {
+      console.error("Error creating designation:", error);
+      toast.error("Something went wrong while creating!");
     }
-  } catch (error) {
-    console.error("Error creating designation:", error);
-  }
-};
-
+  };
 
   return (
     <div className="container mt-3">
