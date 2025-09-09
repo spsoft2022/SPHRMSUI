@@ -1,8 +1,9 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Button, Col, Form, Row } from "react-bootstrap";
+import { Col, Form, Row } from "react-bootstrap";
 import { toast } from "react-toastify";
 
+import ButtonComponent from "../../shared/ButtonComponent";
 import CheckboxGroup from "../../shared/CheckboxGroup";
 import InputField from "../../shared/InputField";
 import RadioGroup from "../../shared/RadioGroup";
@@ -520,13 +521,8 @@ function InitiationDetailsForm() {
           </Col>
         </Row>
         <div className="d-flex justify-content-center mt-4">
-          <Button type="reset" variant="danger" className="me-2">
-            RESET
-          </Button>
-
-          <Button type="submit" variant="primary">
-            CREATE
-          </Button>
+          <ButtonComponent type="reset" variant="danger" label="RESET" className="me-2" />
+          <ButtonComponent type="submit" variant="primary" label="CREATE" />
         </div>
       </Form>
     </div>
