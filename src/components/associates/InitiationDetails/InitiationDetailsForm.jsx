@@ -339,6 +339,43 @@ function InitiationDetailsForm() {
    */
   const reportingAssociateOptions = [{ label: "Admin-HR", value: "Admin-HR" }];
 
+  /**
+   * Resets the form data and clears the dropdown options.
+   */
+  const handleReset = () => {
+    // Reset all form fields to their initial empty or default values
+    setFormData({
+      associateNo: "",
+      fullName: "",
+      personalEmail: "",
+      companyEmail: "",
+      gender: "Male",
+      dateOfBirth: "",
+      dateOfJoining: "",
+      role: "",
+      joiningDesignation: "",
+      joiningCTC: "",
+      currentStatus: "Active",
+      employmentType: "",
+      department: "",
+      reportingAssociate: "",
+      client: "",
+      headOffice: "",
+      sites: [],
+    });
+
+    // Reset the options arrays to empty to hide data from dropdowns
+    setSelectOptions((prev) => ({
+      ...prev,
+      clients: [],
+      headOffices: [],
+      filteredReportingAssociates: [],
+    }));
+
+    // Reset role enablement
+    setIsRoleEnabled(false);
+  };
+
   return (
     <div>
       <h4 className="mb-3">Initiation Details</h4>
@@ -386,6 +423,7 @@ function InitiationDetailsForm() {
               value={formData.personalEmail}
               onChange={handleChange}
               placeholder="name@domain.com"
+              required
             />
           </Col>
           <Col md={4}>
@@ -521,7 +559,7 @@ function InitiationDetailsForm() {
           </Col>
         </Row>
         <div className="d-flex justify-content-center mt-4">
-          <ButtonComponent type="reset" variant="danger" label="RESET" className="me-2" />
+          <ButtonComponent type="reset" variant="danger" label="RESET" className="me-2" onClick={handleReset} />
           <ButtonComponent type="submit" variant="primary" label="CREATE" />
         </div>
       </Form>
