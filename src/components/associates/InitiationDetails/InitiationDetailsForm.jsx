@@ -218,7 +218,7 @@ function InitiationDetailsForm() {
     // If all validations pass, proceed with API call
     console.log("Initiation Form Data:", formData);
     try {
-      const response = await axios.post("http://localhost:5000/associates/initiation", formData);
+      const response = await axios.post("http://localhost:5000/associates/viewAllAssociates", formData);
       console.log("Data saved successfully:", response.data);
       toast.success("Form submitted successfully!");
 
