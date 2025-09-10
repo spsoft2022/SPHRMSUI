@@ -2,7 +2,6 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
 import CustomTable from "../../shared/customtable/CustomTable";
 
 function OnSite() {
@@ -10,7 +9,7 @@ function OnSite() {
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({ clientName: "", clientLocation: "" });
   const [editClientId, setEditClientId] = useState(null);
-
+ const [associates, setAssociates] = useState([]);
   useEffect(() => {
     fetchClients();
   }, []);

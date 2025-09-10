@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button, Col, Form, Row } from "react-bootstrap";
 
 function RegistrationDetailsForm() {
@@ -27,21 +27,76 @@ function RegistrationDetailsForm() {
     presentAddress: "",
   });
 
+  const [loading, setLoading] = useState(false);
+
+  // Handle input change
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  // Fetch registration if associateNo entered
+  const fetchRegistration = async () => {
+    if (!formData.associateNo) return;
+
+    try {
+      setLoading(true);
+      const res = await fetch(
+        `http://localhost:5000/associates/registration/${formData.associateNo}`
+      );
+      const data = await res.json();
+
+      if (res.ok && data.exists) {
+        setFormData((prev) => ({
+          ...prev,
+          ...data.registration, // backend should send registration object
+          associateNo: formData.associateNo, // keep associateNo intact
+        }));
+      }
+    } catch (err) {
+      console.error("Fetch error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Save or update registration
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitted Registration Data:", formData);
+
+    try {
+      setLoading(true);
+      const response = await fetch(
+        "http://localhost:5000/associates/registration",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        }
+      );
+
+      const result = await response.json();
+
+      if (response.ok) {
+        alert("Registration saved successfully ✅");
+        console.log("Saved data:", result.data);
+      } else {
+        alert(`Error: ${result.message}`);
+        console.error(result.error);
+      }
+    } catch (error) {
+      console.error("Request failed:", error);
+      alert("Failed to connect to server ❌");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="container mt-4">
+      <h3 className="mb-3">Associate Registration</h3>
       <Form onSubmit={handleSubmit}>
         {/* First Row */}
-        {/* First Row - Associate No, Marital Status, Blood Group */}
         <Row>
           <Col md={4}>
             <Form.Group className="mb-3">
@@ -49,9 +104,11 @@ function RegistrationDetailsForm() {
               <Form.Control
                 type="text"
                 name="associateNo"
-                placeholder="Enter Associate ID"
                 value={formData.associateNo}
                 onChange={handleChange}
+                onBlur={fetchRegistration} // auto-fetch on blur
+                placeholder="Enter Associate No"
+                required
               />
             </Form.Group>
           </Col>
@@ -61,8 +118,8 @@ function RegistrationDetailsForm() {
               <div>
                 <Form.Check
                   inline
-                  label={<span className="custom-radio-label">Single</span>}
                   type="radio"
+                  label="Single"
                   name="maritalStatus"
                   value="Single"
                   checked={formData.maritalStatus === "Single"}
@@ -70,8 +127,8 @@ function RegistrationDetailsForm() {
                 />
                 <Form.Check
                   inline
-                  label={<span className="custom-radio-label">Married</span>}
                   type="radio"
+                  label="Married"
                   name="maritalStatus"
                   value="Married"
                   checked={formData.maritalStatus === "Married"}
@@ -87,11 +144,8 @@ function RegistrationDetailsForm() {
                 name="bloodGroup"
                 value={formData.bloodGroup}
                 onChange={handleChange}
-                className={formData.bloodGroup === "" ? "placeholder-select" : ""}
               >
-                <option value="" disabled>
-                  Select Blood Group
-                </option>
+                <option value="">Select Blood Group</option>
                 <option value="A+">A+</option>
                 <option value="A-">A-</option>
                 <option value="B+">B+</option>
@@ -105,124 +159,121 @@ function RegistrationDetailsForm() {
           </Col>
         </Row>
 
-        {/* Second Row - PAN, Aadhaar, UAN */}
+        {/* PAN, Aadhaar, UAN */}
         <Row>
           <Col md={4}>
             <Form.Group className="mb-3">
-              <Form.Label>PAN Number</Form.Label>
+              <Form.Label>PAN No</Form.Label>
               <Form.Control
                 type="text"
                 name="panNo"
-                placeholder="Enter PAN No"
                 value={formData.panNo}
                 onChange={handleChange}
+                placeholder="Enter PAN"
               />
             </Form.Group>
           </Col>
           <Col md={4}>
             <Form.Group className="mb-3">
-              <Form.Label>Aadhaar Number</Form.Label>
+              <Form.Label>Aadhaar</Form.Label>
               <Form.Control
                 type="text"
                 name="aadhaar"
-                placeholder="Enter Aadhaar Number"
                 value={formData.aadhaar}
                 onChange={handleChange}
+                placeholder="Enter Aadhaar"
               />
             </Form.Group>
           </Col>
           <Col md={4}>
             <Form.Group className="mb-3">
-              <Form.Label>UAN Number</Form.Label>
+              <Form.Label>UAN No</Form.Label>
               <Form.Control
                 type="text"
                 name="uanNo"
-                placeholder="Enter UAN No"
                 value={formData.uanNo}
                 onChange={handleChange}
+                placeholder="Enter UAN"
               />
             </Form.Group>
           </Col>
         </Row>
 
-        {/* Third Row - PF, ESIC, Insurance */}
+        {/* PF, ESIC, Insurance */}
         <Row>
           <Col md={4}>
             <Form.Group className="mb-3">
-              <Form.Label>PF Number</Form.Label>
+              <Form.Label>PF No</Form.Label>
               <Form.Control
                 type="text"
                 name="pfNo"
-                placeholder="Enter PF No"
                 value={formData.pfNo}
                 onChange={handleChange}
+                placeholder="Enter PF"
               />
             </Form.Group>
           </Col>
           <Col md={4}>
             <Form.Group className="mb-3">
-              <Form.Label>ESIC Number</Form.Label>
+              <Form.Label>ESIC No</Form.Label>
               <Form.Control
                 type="text"
                 name="esicNo"
-                placeholder="Enter ESIC No"
                 value={formData.esicNo}
                 onChange={handleChange}
+                placeholder="Enter ESIC"
               />
             </Form.Group>
           </Col>
           <Col md={4}>
             <Form.Group className="mb-3">
-              <Form.Label>Insurance Number</Form.Label>
+              <Form.Label>Insurance No</Form.Label>
               <Form.Control
                 type="text"
                 name="insuranceNo"
-                placeholder="Enter Insurance No"
                 value={formData.insuranceNo}
                 onChange={handleChange}
+                placeholder="Enter Insurance"
               />
             </Form.Group>
           </Col>
         </Row>
 
-        {/* Fourth Row - Bank, Mobile, Emergency Contact */}
+        {/* Bank, Mobile, Designation */}
         <Row>
           <Col md={4}>
             <Form.Group className="mb-3">
-              <Form.Label>Bank Account No</Form.Label>
+              <Form.Label>Bank Account</Form.Label>
               <Form.Control
                 type="text"
                 name="bankAccount"
-                placeholder="Enter Bank A/c No"
                 value={formData.bankAccount}
                 onChange={handleChange}
+                placeholder="Enter Bank Account"
               />
             </Form.Group>
           </Col>
           <Col md={4}>
             <Form.Group className="mb-3">
-              <Form.Label>Mobile Number</Form.Label>
+              <Form.Label>Mobile</Form.Label>
               <Form.Control
                 type="text"
                 name="mobile"
-                placeholder="Enter Mobile Number"
                 value={formData.mobile}
                 onChange={handleChange}
+                placeholder="Enter Mobile"
               />
             </Form.Group>
           </Col>
           <Col md={4}>
             <Form.Group className="mb-3">
-              <Form.Label>Current Designation</Form.Label>
+              <Form.Label>Designation</Form.Label>
               <Form.Select
                 name="designation"
                 value={formData.designation}
                 onChange={handleChange}
-                className={formData.designation === "" ? "placeholder-select" : ""}
               >
-                <option value="" disabled>
-                  Select Designation
-                </option>
+                <option value="">Select Designation</option>
                 <option value="Developer">Developer</option>
                 <option value="Designer">Designer</option>
                 <option value="Manager">Manager</option>
@@ -231,17 +282,17 @@ function RegistrationDetailsForm() {
           </Col>
         </Row>
 
-        {/* Fifth Row - 2nd Emergency, Relation, Relation Name */}
+        {/* Emergency Contacts */}
         <Row>
           <Col md={4}>
             <Form.Group className="mb-3">
-              <Form.Label>Emergency Contact Number</Form.Label>
+              <Form.Label>Emergency Contact 1</Form.Label>
               <Form.Control
                 type="text"
                 name="emergencyContact1"
-                placeholder="Enter Emergency Contact No"
                 value={formData.emergencyContact1}
                 onChange={handleChange}
+                placeholder="Enter Contact"
               />
             </Form.Group>
           </Col>
@@ -251,9 +302,9 @@ function RegistrationDetailsForm() {
               <Form.Control
                 type="text"
                 name="relation1"
-                placeholder="Enter Relation"
                 value={formData.relation1}
                 onChange={handleChange}
+                placeholder="Enter Relation"
               />
             </Form.Group>
           </Col>
@@ -263,25 +314,25 @@ function RegistrationDetailsForm() {
               <Form.Control
                 type="text"
                 name="relationName1"
-                placeholder="Enter Relation Name"
                 value={formData.relationName1}
                 onChange={handleChange}
+                placeholder="Enter Name"
               />
             </Form.Group>
           </Col>
         </Row>
 
-        {/* Sixth Row - Relation 2, Relation Name 2, Designation */}
+        {/* Emergency Contact 2 */}
         <Row>
           <Col md={4}>
             <Form.Group className="mb-3">
-              <Form.Label>Second Emergency Contact</Form.Label>
+              <Form.Label>Emergency Contact 2</Form.Label>
               <Form.Control
                 type="text"
                 name="emergencyContact2"
-                placeholder="Enter Emergency Contact No"
                 value={formData.emergencyContact2}
                 onChange={handleChange}
+                placeholder="Enter Contact"
               />
             </Form.Group>
           </Col>
@@ -291,9 +342,9 @@ function RegistrationDetailsForm() {
               <Form.Control
                 type="text"
                 name="relation2"
-                placeholder="Enter Relation"
                 value={formData.relation2}
                 onChange={handleChange}
+                placeholder="Enter Relation"
               />
             </Form.Group>
           </Col>
@@ -303,52 +354,55 @@ function RegistrationDetailsForm() {
               <Form.Control
                 type="text"
                 name="relationName2"
-                placeholder="Enter Relation Name"
                 value={formData.relationName2}
                 onChange={handleChange}
+                placeholder="Enter Name"
               />
             </Form.Group>
           </Col>
         </Row>
 
-        {/* Seventh Row - Revision, CTC, Permanent Address */}
+        {/* Revision, CTC, Addresses */}
         <Row>
           <Col md={4}>
             <Form.Group className="mb-3">
-              <Form.Label>Next Revision</Form.Label>
+              <Form.Label>Revision Month</Form.Label>
               <Form.Select
                 name="revision"
                 value={formData.revision}
                 onChange={handleChange}
-                className={formData.revision === "" ? "placeholder-select" : ""}
               >
-                <option value="" disabled>
-                  Select Next Revision
-                </option>
-                <option value="January">January</option>
-                <option value="February">February</option>
-                <option value="March">March</option>
-                <option value="April">April</option>
-                <option value="May">May</option>
-                <option value="June">June</option>
-                <option value="July">July</option>
-                <option value="August">August</option>
-                <option value="September">September</option>
-                <option value="October">October</option>
-                <option value="November">November</option>
-                <option value="December">December</option>
+                <option value="">Select Month</option>
+                {[
+                  "January",
+                  "February",
+                  "March",
+                  "April",
+                  "May",
+                  "June",
+                  "July",
+                  "August",
+                  "September",
+                  "October",
+                  "November",
+                  "December",
+                ].map((m) => (
+                  <option key={m} value={m}>
+                    {m}
+                  </option>
+                ))}
               </Form.Select>
             </Form.Group>
           </Col>
           <Col md={4}>
             <Form.Group className="mb-3">
-              <Form.Label>Present CTC</Form.Label>
+              <Form.Label>CTC</Form.Label>
               <Form.Control
                 type="text"
                 name="ctc"
-                placeholder="Enter Present CTC"
                 value={formData.ctc}
                 onChange={handleChange}
+                placeholder="Enter CTC"
               />
             </Form.Group>
           </Col>
@@ -357,17 +411,16 @@ function RegistrationDetailsForm() {
               <Form.Label>Permanent Address</Form.Label>
               <Form.Control
                 as="textarea"
-                rows={1}
+                rows={2}
                 name="permanentAddress"
-                placeholder="Enter Permanent Address"
                 value={formData.permanentAddress}
                 onChange={handleChange}
+                placeholder="Enter Permanent Address"
               />
             </Form.Group>
           </Col>
         </Row>
 
-        {/* Eighth Row - Present Address */}
         <Row>
           <Col md={12}>
             <Form.Group className="mb-3">
@@ -376,9 +429,9 @@ function RegistrationDetailsForm() {
                 as="textarea"
                 rows={2}
                 name="presentAddress"
-                placeholder="Enter Present Address"
                 value={formData.presentAddress}
                 onChange={handleChange}
+                placeholder="Enter Present Address"
               />
             </Form.Group>
           </Col>
@@ -386,11 +439,40 @@ function RegistrationDetailsForm() {
 
         {/* Buttons */}
         <div className="d-flex justify-content-center gap-3 mt-3">
-          <Button variant="danger" type="reset">
-            RESET
+          <Button
+            variant="secondary"
+            type="button"
+            onClick={() =>
+              setFormData({
+                associateNo: "",
+                maritalStatus: "Single",
+                panNo: "",
+                uanNo: "",
+                emergencyContact1: "",
+                emergencyContact2: "",
+                bloodGroup: "",
+                bankAccount: "",
+                mobile: "",
+                aadhaar: "",
+                insuranceNo: "",
+                pfNo: "",
+                esicNo: "",
+                relation1: "",
+                relationName1: "",
+                relation2: "",
+                relationName2: "",
+                designation: "",
+                revision: "",
+                ctc: "",
+                permanentAddress: "",
+                presentAddress: "",
+              })
+            }
+          >
+            Reset
           </Button>
-          <Button variant="primary" type="submit">
-            UPDATE
+          <Button variant="primary" type="submit" disabled={loading}>
+            {loading ? "Saving..." : "Save / Update"}
           </Button>
         </div>
       </Form>
