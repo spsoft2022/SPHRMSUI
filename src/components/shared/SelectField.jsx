@@ -5,27 +5,26 @@ const SelectField = ({ label, name, value, onChange, options, placeholder, disab
   return (
     <Form.Group className="mb-3">
       <Form.Label>{label}</Form.Label>
-      <Form.Select
-        name={name}
-        value={value}
-        onChange={onChange}
-        className={value === "" ? "placeholder-select" : ""}
-        disabled={disabled}
-      >
-        <option value="" disabled>
-          {placeholder}
-        </option>
-        {options.map((option, index) => (
-          <option
-            key={index}
-            value={option.value}
-            disabled={option.disabled} // Apply the disabled prop from the options array
-            className={option.disabled ? "disabled-option" : ""} // Apply the CSS class
-          >
-            {option.label}
-          </option>
-        ))}
-      </Form.Select>
+     <Form.Select
+  name={name}
+  value={value}
+  onChange={onChange}
+  className={value === "" ? "placeholder-select" : ""}
+  disabled={disabled}
+>
+  <option value="">{placeholder}</option>   {/* ✅ no disabled */}
+  {options.map((option, index) => (
+    <option
+      key={index}
+      value={option.value}
+      disabled={option.disabled}
+      className={option.disabled ? "disabled-option" : ""}
+    >
+      {option.label}
+    </option>
+  ))}
+</Form.Select>
+
     </Form.Group>
   );
 };

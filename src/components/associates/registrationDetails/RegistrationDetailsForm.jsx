@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button, Col, Form, Row } from "react-bootstrap";
+import axios from "axios";
 
 function RegistrationDetailsForm() {
   const [formData, setFormData] = useState({
@@ -28,12 +29,33 @@ function RegistrationDetailsForm() {
   });
 
   const [loading, setLoading] = useState(false);
+  const [designations, setDesignations] = useState([]); // State for storing designations
+const [associates, setAssociates] = useState([]);
+  // Fetch designations from the API
+ const fetchDesignations = async () => {
+  try {
+    const [designationsRes, associatesRes] = await Promise.all([
+      axios.get("http://localhost:5000/associates/designations"),
+          axios.get("http://localhost:5000/associates/allAssociates"),
+    ]);
 
-  // Handle input change
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+    console.log("Fetched designations:", designationsRes.data);
+    console.log("Fetched associates:", associatesRes.data);
+
+    if (designationsRes.status === 200) {
+      const fetchedDesignations = designationsRes.data.result || [];
+      setDesignations(fetchedDesignations);
+    }
+
+    if (associatesRes.status === 200) {
+      const fetchedAssociates = associatesRes.data.data || [];
+      setAssociates(fetchedAssociates); // make sure you have state for associates
+    }
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+};
+
 
   // Fetch registration if associateNo entered
   const fetchRegistration = async () => {
@@ -41,8 +63,8 @@ function RegistrationDetailsForm() {
 
     try {
       setLoading(true);
-      const res = await fetch(
-        `http://localhost:5000/associates/registration/${formData.associateNo}`
+     const res = await fetch(
+        `http://localhost:5000/associates/${formData.associateNo}`
       );
       const data = await res.json();
 
@@ -58,6 +80,12 @@ function RegistrationDetailsForm() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Handle input change
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   // Save or update registration
@@ -91,6 +119,11 @@ function RegistrationDetailsForm() {
       setLoading(false);
     }
   };
+
+  // Fetch designations when component mounts
+  useEffect(() => {
+    fetchDesignations(); // Fetch designations when the component mounts
+  }, []);
 
   return (
     <div className="container mt-4">
@@ -274,9 +307,15 @@ function RegistrationDetailsForm() {
                 onChange={handleChange}
               >
                 <option value="">Select Designation</option>
-                <option value="Developer">Developer</option>
-                <option value="Designer">Designer</option>
-                <option value="Manager">Manager</option>
+                {Array.isArray(designations) && designations.length > 0 ? (
+                  designations.map((designation) => (
+                    <option key={designation.designationId} value={designation.name}>
+                      {designation.name}
+                    </option>
+                  ))
+                ) : (
+                  <option disabled>No Designations Available</option>
+                )}
               </Form.Select>
             </Form.Group>
           </Col>
