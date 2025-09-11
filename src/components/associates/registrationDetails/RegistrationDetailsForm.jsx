@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
-import { Button, Col, Form, Row } from "react-bootstrap";
 import axios from "axios";
+import { useEffect, useState } from "react";
+import { Button, Col, Form, ListGroup, Row } from "react-bootstrap";
 
 function RegistrationDetailsForm() {
   const [formData, setFormData] = useState({
@@ -27,59 +27,79 @@ function RegistrationDetailsForm() {
     permanentAddress: "",
     presentAddress: "",
   });
+  const [associateNo, setAssociateNo] = useState("");
 
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
   const [designations, setDesignations] = useState([]); // State for storing designations
-const [associates, setAssociates] = useState([]);
+  const [associates, setAssociates] = useState([]);
+  const [suggestions, setSuggestions] = useState([]);
+  const [isAssociateValid, setIsAssociateValid] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   // Fetch designations from the API
- const fetchDesignations = async () => {
-  try {
-    const [designationsRes, associatesRes] = await Promise.all([
-      axios.get("http://localhost:5000/associates/designations"),
-          axios.get("http://localhost:5000/associates/allAssociates"),
-    ]);
-
-    console.log("Fetched designations:", designationsRes.data);
-    console.log("Fetched associates:", associatesRes.data);
-
-    if (designationsRes.status === 200) {
-      const fetchedDesignations = designationsRes.data.result || [];
-      setDesignations(fetchedDesignations);
-    }
-
-    if (associatesRes.status === 200) {
-      const fetchedAssociates = associatesRes.data.data || [];
-      setAssociates(fetchedAssociates); // make sure you have state for associates
-    }
-  } catch (error) {
-    console.error("Error fetching data:", error);
-  }
-};
-
-
-  // Fetch registration if associateNo entered
-  const fetchRegistration = async () => {
-    if (!formData.associateNo) return;
-
+  const fetchDesignations = async () => {
     try {
-      setLoading(true);
-     const res = await fetch(
-        `http://localhost:5000/associates/${formData.associateNo}`
-      );
-      const data = await res.json();
+      const [designationsRes, associatesRes] = await Promise.all([
+        axios.get("http://localhost:5000/associates/designations"),
+        axios.get("http://localhost:5000/associates/allAssociates"),
+      ]);
 
-      if (res.ok && data.exists) {
-        setFormData((prev) => ({
-          ...prev,
-          ...data.registration, // backend should send registration object
-          associateNo: formData.associateNo, // keep associateNo intact
-        }));
+      console.log("Fetched designations:", designationsRes.data);
+      console.log("Fetched associates:", associatesRes.data);
+
+      if (designationsRes.status === 200) {
+        const fetchedDesignations = designationsRes.data.result || [];
+        setDesignations(fetchedDesignations);
       }
-    } catch (err) {
-      console.error("Fetch error:", err);
+
+      if (associatesRes.status === 200) {
+        const fetchedAssociates = associatesRes.data.data || [];
+        setAssociates(fetchedAssociates); // make sure you have state for associates
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const handleAssociateChange = (e) => {
+    const value = e.target.value.replace(/\D/g, ""); // remove non-digits
+    setAssociateNo(value);
+    setIsAssociateValid(false); // reset until user selects
+  };
+
+  // Fetch matching associates immediately (no debounce)
+  const fetchAssociates = async (number) => {
+    if (!number) {
+      setSuggestions([]);
+      return;
+    }
+    setLoading(true);
+    try {
+      const response = await axios.get(`http://localhost:5000/associates/search/${number}`);
+      if (response.status === 200) {
+        setSuggestions(response.data);
+      }
+    } catch (error) {
+      setSuggestions([]);
     } finally {
       setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    if (associateNo) {
+      fetchAssociates(associateNo);
+    } else {
+      setSuggestions([]);
+    }
+  }, [associateNo]);
+
+  // When user selects from dropdown
+  const handleSelectAssociate = (assoc) => {
+    setAssociateNo(assoc.associateNo); // fill input
+    setIsAssociateValid(true); // show form
+    setSuggestions([]); // clear suggestions
+    document.activeElement.blur(); // remove focus from input (closes dropdown neatly)
   };
 
   // Handle input change
@@ -94,14 +114,11 @@ const [associates, setAssociates] = useState([]);
 
     try {
       setLoading(true);
-      const response = await fetch(
-        "http://localhost:5000/associates/registration",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        }
-      );
+      const response = await fetch("http://localhost:5000/associates/registration", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
       const result = await response.json();
 
@@ -131,19 +148,28 @@ const [associates, setAssociates] = useState([]);
       <Form onSubmit={handleSubmit}>
         {/* First Row */}
         <Row>
-          <Col md={4}>
+          <Col md={4} className="position-relative">
             <Form.Group className="mb-3">
               <Form.Label>Associate No</Form.Label>
               <Form.Control
                 type="text"
                 name="associateNo"
-                value={formData.associateNo}
-                onChange={handleChange}
-                onBlur={fetchRegistration} // auto-fetch on blur
+                value={associateNo}
+                onChange={handleAssociateChange}
+                // onBlur={fetchRegistration} // auto-fetch on blur
                 placeholder="Enter Associate No"
                 required
               />
             </Form.Group>
+            {suggestions.length > 0 && (
+              <ListGroup className="position-absolute w-100" style={{ zIndex: 1000 }}>
+                {suggestions.map((assoc) => (
+                  <ListGroup.Item key={assoc._id} action onClick={() => handleSelectAssociate(assoc)}>
+                    {assoc.associateNo} - {assoc.initiation?.fullName}
+                  </ListGroup.Item>
+                ))}
+              </ListGroup>
+            )}
           </Col>
           <Col md={4}>
             <Form.Group className="mb-3">
@@ -173,11 +199,7 @@ const [associates, setAssociates] = useState([]);
           <Col md={4}>
             <Form.Group className="mb-3">
               <Form.Label>Blood Group</Form.Label>
-              <Form.Select
-                name="bloodGroup"
-                value={formData.bloodGroup}
-                onChange={handleChange}
-              >
+              <Form.Select name="bloodGroup" value={formData.bloodGroup} onChange={handleChange}>
                 <option value="">Select Blood Group</option>
                 <option value="A+">A+</option>
                 <option value="A-">A-</option>
@@ -301,11 +323,7 @@ const [associates, setAssociates] = useState([]);
           <Col md={4}>
             <Form.Group className="mb-3">
               <Form.Label>Designation</Form.Label>
-              <Form.Select
-                name="designation"
-                value={formData.designation}
-                onChange={handleChange}
-              >
+              <Form.Select name="designation" value={formData.designation} onChange={handleChange}>
                 <option value="">Select Designation</option>
                 {Array.isArray(designations) && designations.length > 0 ? (
                   designations.map((designation) => (
@@ -406,11 +424,7 @@ const [associates, setAssociates] = useState([]);
           <Col md={4}>
             <Form.Group className="mb-3">
               <Form.Label>Revision Month</Form.Label>
-              <Form.Select
-                name="revision"
-                value={formData.revision}
-                onChange={handleChange}
-              >
+              <Form.Select name="revision" value={formData.revision} onChange={handleChange}>
                 <option value="">Select Month</option>
                 {[
                   "January",
