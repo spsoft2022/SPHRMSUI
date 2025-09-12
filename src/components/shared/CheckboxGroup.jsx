@@ -1,18 +1,18 @@
 import { Form } from "react-bootstrap";
 
-const CheckboxGroup = ({ label, sites, formData, onChange }) => {
+function CheckboxGroup({ label, sites = [], formData, onChange }) {
   return (
     <Form.Group className="mb-3">
       <Form.Label>{label}</Form.Label>
       <div>
         {sites.map((site) => (
           <Form.Check
-            key={site.siteId}
+            key={site._id}
             type="checkbox"
-            id={site.siteId}
+            id={`site-checkbox-${site.siteName}`}
             label={site.siteName}
-            name={site.siteName.toLowerCase()}
-            checked={formData.sites.includes(site.siteName.toLowerCase())}
+            name={site.siteName}
+            checked={formData.sites.includes(site.siteName)}
             onChange={onChange}
             className="d-inline-block me-3"
           />
@@ -20,6 +20,6 @@ const CheckboxGroup = ({ label, sites, formData, onChange }) => {
       </div>
     </Form.Group>
   );
-};
+}
 
 export default CheckboxGroup;

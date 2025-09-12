@@ -1,9 +1,10 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { FaEdit, FaTrashAlt, FaEye} from "react-icons/fa";
-import { Modal,Table, Spinner, ListGroup, Row, Col, Form } from "react-bootstrap";
-import InputField from "../../shared/InputField";
+import { Col, Form, ListGroup, Row, Spinner, Table } from "react-bootstrap";
+import { FaEdit, FaEye, FaTrashAlt } from "react-icons/fa";
+
 import ButtonComponent from "../../shared/ButtonComponent";
+import InputField from "../../shared/InputField";
 import SelectField from "../../shared/SelectField";
 
 const EducationDetails = () => {
@@ -25,8 +26,8 @@ const EducationDetails = () => {
   const [associateNo, setAssociateNo] = useState("");
   const [educationTableData, setEducationTableData] = useState([]); // store table data
   const [showModal, setShowModal] = useState(false);
-   const [viewDocument, setViewDocument] = useState(null);
-    const [submittedData, setSubmittedData] = useState(null);
+  const [viewDocument, setViewDocument] = useState(null);
+  const [submittedData, setSubmittedData] = useState(null);
 
   // ---------------- Fetch master education list ----------------
   useEffect(() => {
@@ -143,18 +144,16 @@ const EducationDetails = () => {
     // Optionally, blur the input to remove focus once a selection is made
     document.activeElement.blur();
   };
-const handleView = (data) => {
-  if (data && data.document) {
-    setViewDocument(data.document); 
-    setShowModal(true); 
-  } else {
-    alert("No document available for this education entry.");
-  }
-};
-
-
-  const handleEdit = (data) => {
+  const handleView = (data) => {
+    if (data && data.document) {
+      setViewDocument(data.document);
+      setShowModal(true);
+    } else {
+      alert("No document available for this education entry.");
+    }
   };
+
+  const handleEdit = (data) => {};
 
   const handleDelete = (associateNo) => {
     const confirmDelete = window.confirm(`Are you sure you want to delete Associate No: ${associateNo}?`);
@@ -185,11 +184,7 @@ const handleView = (data) => {
             {suggestions.length > 0 && (
               <ListGroup className="position-absolute w-100" style={{ zIndex: 1000 }}>
                 {suggestions.map((assoc) => (
-                  <ListGroup.Item
-                    key={assoc._id}
-                    action
-                    onClick={() => handleSelectAssociate(assoc)}
-                  >
+                  <ListGroup.Item key={assoc._id} action onClick={() => handleSelectAssociate(assoc)}>
                     {assoc.associateNo} - {assoc.initiation?.fullName}
                   </ListGroup.Item>
                 ))}
@@ -316,7 +311,6 @@ const handleView = (data) => {
       {/* Table to show education data */}
       {educationTableData.length > 0 && (
         <div className="mt-4">
-
           <Table bordered>
             <thead>
               <tr>
@@ -344,32 +338,30 @@ const handleView = (data) => {
                   <td>{edu.percentage}</td>
                   <td>
                     <FaEye
-                      size={20}
+                      size={15}
                       className="me-3 text-primary"
-                      style={{ cursor: 'pointer' }}
+                      style={{ cursor: "pointer" }}
                       onClick={() => handleView(edu)} // View document
                     />
                     <FaEdit
-                      size={20}
+                      size={15}
                       className="me-3 text-warning"
-                      style={{ cursor: 'pointer' }}
+                      style={{ cursor: "pointer" }}
                       onClick={() => handleEdit(edu)} // Edit details
                     />
                     <FaTrashAlt
-                      size={20}
+                      size={15}
                       className="me-3 text-danger"
-                      style={{ cursor: 'pointer' }}
+                      style={{ cursor: "pointer" }}
                       onClick={() => handleDelete(edu.associateNo)} // Delete data
                     />
                   </td>
-
                 </tr>
               ))}
             </tbody>
           </Table>
         </div>
       )}
-       
     </div>
   );
 };

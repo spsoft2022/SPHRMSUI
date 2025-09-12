@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
-import { FaEdit, FaTrashAlt, FaEye, FaPaperclip } from "react-icons/fa";
-import { Modal, Button, Table, Spinner, ListGroup, Row, Col, Form } from "react-bootstrap";
 import axios from "axios";
-import InputField from "../../shared/InputField";
+import { useEffect, useState } from "react";
+import { Button, Col, Form, ListGroup, Modal, Row, Spinner, Table } from "react-bootstrap";
+import { FaEdit, FaEye, FaPaperclip, FaTrashAlt } from "react-icons/fa";
+
 import ButtonComponent from "../../shared/ButtonComponent";
+import InputField from "../../shared/InputField";
 
 function EmploymentDetailsForm() {
   const [associateNo, setAssociateNo] = useState("");
@@ -106,7 +107,7 @@ function EmploymentDetailsForm() {
           document: document ? document.name : "No file uploaded",
         });
       }
-       setEmployment({
+      setEmployment({
         dateOfJoining: "",
         lastWorkingDate: "",
         organizationName: "",
@@ -124,8 +125,7 @@ function EmploymentDetailsForm() {
     setShowModal(true); // Open the modal
   };
 
-  const handleEdit = (data) => {
-  };
+  const handleEdit = (data) => {};
 
   const handleDelete = (associateNo) => {
     const confirmDelete = window.confirm(`Are you sure you want to delete Associate No: ${associateNo}?`);
@@ -221,23 +221,11 @@ function EmploymentDetailsForm() {
                 <FaPaperclip size={15} className="me-2" />
                 Upload Document
               </Form.Label>
-              <Form.Control
-                type="file"
-                id="fileUpload"
-                onChange={handleFileChange}
-                style={{ display: "none" }}
-              />
-
+              <Form.Control type="file" id="fileUpload" onChange={handleFileChange} style={{ display: "none" }} />
             </Form.Group>
 
-
             <div className="text-center mt-3">
-              <ButtonComponent
-                label="CREATE"
-                type="submit"
-                variant="primary"
-                className="mt-2"
-              />
+              <ButtonComponent label="CREATE" type="submit" variant="primary" className="mt-2" />
             </div>
           </>
         )}
@@ -246,7 +234,7 @@ function EmploymentDetailsForm() {
       {/* Table to show submitted data */}
       {submittedData && (
         <div className="mt-4">
-          <Table  bordered>
+          <Table bordered>
             <thead>
               <tr>
                 <th>Associate No</th>
@@ -266,21 +254,21 @@ function EmploymentDetailsForm() {
                 <td>{submittedData.workLocation}</td>
                 <td>
                   <FaEye
-                    size={2}
+                    size={15}
                     className="me-3 text-primary"
-                    style={{ cursor: 'pointer' }}
+                    style={{ cursor: "pointer" }}
                     onClick={() => handleView(submittedData)} // View document
                   />
                   <FaEdit
-                    size={2}
+                    size={15}
                     className="me-3 text-warning"
-                    style={{ cursor: 'pointer' }}
+                    style={{ cursor: "pointer" }}
                     onClick={() => handleEdit(submittedData)} // Edit details
                   />
                   <FaTrashAlt
-                    size={2}
+                    size={15}
                     className="me-3 text-danger"
-                    style={{ cursor: 'pointer' }}
+                    style={{ cursor: "pointer" }}
                     onClick={() => handleDelete(submittedData.associateNo)} // Delete data
                   />
                 </td>
@@ -289,7 +277,6 @@ function EmploymentDetailsForm() {
           </Table>
         </div>
       )}
-
 
       {/* Modal for viewing document */}
       <Modal show={showModal} onHide={handleCloseModal}>
@@ -314,7 +301,6 @@ function EmploymentDetailsForm() {
           </Button>
         </Modal.Footer>
       </Modal>
-
     </div>
   );
 }

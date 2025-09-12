@@ -1,7 +1,10 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Button, Col, Form, ListGroup, Row, Spinner } from "react-bootstrap";
+import { Col, Form, ListGroup, Row, Spinner } from "react-bootstrap";
 import { toast } from "react-toastify";
+
+import ButtonComponent from "../../shared/ButtonComponent";
+import InputField from "../../shared/InputField";
 
 function FamilyDetailsForm() {
   const [associateNo, setAssociateNo] = useState("");
@@ -19,14 +22,12 @@ function FamilyDetailsForm() {
   const [isAssociateValid, setIsAssociateValid] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Allow only numbers for Associate No
   const handleAssociateChange = (e) => {
-    const value = e.target.value.replace(/\D/g, ""); // remove non-digits
+    const value = e.target.value.replace(/\D/g, "");
     setAssociateNo(value);
-    setIsAssociateValid(false); // reset until user selects
+    setIsAssociateValid(false);
   };
 
-  // Fetch matching associates immediately (no debounce)
   const fetchAssociates = async (number) => {
     if (!number) {
       setSuggestions([]);
@@ -53,12 +54,56 @@ function FamilyDetailsForm() {
     }
   }, [associateNo]);
 
+  // Fetch family details for a selected associate
+  const fetchFamilyDetails = async (number) => {
+    try {
+      const response = await axios.get(`http://localhost:5000/associates/family/${number}`);
+      if (response.status === 200 && response.data) {
+        setFormData({
+          fatherName: response.data.fatherName || "",
+          fatherDob: response.data.fatherDob ? response.data.fatherDob.substring(0, 10) : "",
+          fatherAadhar: response.data.fatherAadhar || "",
+          fatherMobile: response.data.fatherMobile || "",
+          motherName: response.data.motherName || "",
+          motherDob: response.data.motherDob ? response.data.motherDob.substring(0, 10) : "",
+          motherAadhar: response.data.motherAadhar || "",
+          motherMobile: response.data.motherMobile || "",
+        });
+      } else {
+        // no family data, reset fields
+        setFormData({
+          fatherName: "",
+          fatherDob: "",
+          fatherAadhar: "",
+          fatherMobile: "",
+          motherName: "",
+          motherDob: "",
+          motherAadhar: "",
+          motherMobile: "",
+        });
+      }
+    } catch (error) {
+      console.error("No family details found:", error);
+      // reset if not found
+      setFormData({
+        fatherName: "",
+        fatherDob: "",
+        fatherAadhar: "",
+        fatherMobile: "",
+        motherName: "",
+        motherDob: "",
+        motherAadhar: "",
+        motherMobile: "",
+      });
+    }
+  };
+
   // When user selects from dropdown
   const handleSelectAssociate = (assoc) => {
-    setAssociateNo(assoc.associateNo); // fill input
-    setIsAssociateValid(true); // show form
-    setSuggestions([]); // clear suggestions
-    document.activeElement.blur(); // remove focus from input (closes dropdown neatly)
+    setAssociateNo(assoc.associateNo);
+    setIsAssociateValid(true);
+    setSuggestions([]);
+    fetchFamilyDetails(assoc.associateNo); // fetch and populate family details
   };
 
   const handleChange = (e) => {
@@ -70,7 +115,19 @@ function FamilyDetailsForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    toast.success("Form submitted!");
+    try {
+      const response = await axios.post("http://localhost:5000/associates/family", {
+        associateNo,
+        ...formData,
+      });
+      if (response.status === 201) {
+        toast.success("Family details saved successfully!");
+        handleReset();
+      }
+    } catch (error) {
+      console.error("Error saving family details:", error);
+      toast.error(error.response?.data?.message || "Failed to save family details");
+    }
   };
 
   const handleReset = () => {
@@ -92,7 +149,6 @@ function FamilyDetailsForm() {
   return (
     <div className="container mt-4">
       <Form onSubmit={handleSubmit}>
-        {/* Associate Number */}
         <Row className="mb-3">
           <Col md={4} className="position-relative">
             <Form.Group className="mb-3" controlId="associateNo">
@@ -109,9 +165,6 @@ function FamilyDetailsForm() {
                 {loading && <Spinner animation="border" size="sm" className="ms-2" />}
               </div>
             </Form.Group>
-
-            {/* Suggestions Dropdown */}
-            {/* Suggestions Dropdown */}
             {suggestions.length > 0 && (
               <ListGroup className="position-absolute w-100" style={{ zIndex: 1000 }}>
                 {suggestions.map((assoc) => (
@@ -123,118 +176,99 @@ function FamilyDetailsForm() {
             )}
           </Col>
         </Row>
-
         {isAssociateValid && (
           <>
             <p className="mt-3">Please Update Family Details</p>
             <h5 className="mt-2 mb-3">Parent Details</h5>
-
-            {/* Father Details */}
             <Row className="mb-3">
               <Col md={4}>
-                <Form.Group controlId="fatherName">
-                  <Form.Label>Father Name</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Enter Father Name"
-                    name="fatherName"
-                    value={formData.fatherName}
-                    onChange={handleChange}
-                  />
-                </Form.Group>
+                <InputField
+                  label="Father Name"
+                  type="text"
+                  name="fatherName"
+                  value={formData.fatherName}
+                  onChange={handleChange}
+                  placeholder="Enter Father Name"
+                />
               </Col>
               <Col md={4}>
-                <Form.Group controlId="fatherDob">
-                  <Form.Label>Date of Birth</Form.Label>
-                  <Form.Control type="date" name="fatherDob" value={formData.fatherDob} onChange={handleChange} />
-                </Form.Group>
+                <InputField
+                  label="Date of Birth"
+                  type="date"
+                  name="fatherDob"
+                  value={formData.fatherDob}
+                  onChange={handleChange}
+                />
               </Col>
               <Col md={4}>
-                <Form.Group controlId="fatherAadhar">
-                  <Form.Label>Aadhaar Number</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Enter Aadhaar No"
-                    name="fatherAadhar"
-                    value={formData.fatherAadhar}
-                    onChange={handleChange}
-                  />
-                </Form.Group>
+                <InputField
+                  label="Aadhaar Number"
+                  type="text"
+                  name="fatherAadhar"
+                  value={formData.fatherAadhar}
+                  onChange={handleChange}
+                  placeholder="Enter Aadhaar No"
+                />
               </Col>
             </Row>
-
             <Row className="mb-3">
               <Col md={4}>
-                <Form.Group controlId="fatherMobile">
-                  <Form.Label>Mobile Number</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Enter Mobile Number"
-                    name="fatherMobile"
-                    value={formData.fatherMobile}
-                    onChange={handleChange}
-                  />
-                </Form.Group>
+                <InputField
+                  label="Mobile Number"
+                  type="text"
+                  name="fatherMobile"
+                  value={formData.fatherMobile}
+                  onChange={handleChange}
+                  placeholder="Enter Mobile Number"
+                />
               </Col>
             </Row>
-
-            {/* Mother Details */}
             <Row className="mb-3">
               <Col md={4}>
-                <Form.Group controlId="motherName">
-                  <Form.Label>Mother Name</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Enter Mother Name"
-                    name="motherName"
-                    value={formData.motherName}
-                    onChange={handleChange}
-                  />
-                </Form.Group>
+                <InputField
+                  label="Mother Name"
+                  type="text"
+                  name="motherName"
+                  value={formData.motherName}
+                  onChange={handleChange}
+                  placeholder="Enter Mother Name"
+                />
               </Col>
               <Col md={4}>
-                <Form.Group controlId="motherDob">
-                  <Form.Label>Date of Birth</Form.Label>
-                  <Form.Control type="date" name="motherDob" value={formData.motherDob} onChange={handleChange} />
-                </Form.Group>
+                <InputField
+                  label="Date of Birth"
+                  type="date"
+                  name="motherDob"
+                  value={formData.motherDob}
+                  onChange={handleChange}
+                />
               </Col>
               <Col md={4}>
-                <Form.Group controlId="motherAadhar">
-                  <Form.Label>Aadhaar Number</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Enter Aadhaar No"
-                    name="motherAadhar"
-                    value={formData.motherAadhar}
-                    onChange={handleChange}
-                  />
-                </Form.Group>
+                <InputField
+                  label="Aadhaar Number"
+                  type="text"
+                  name="motherAadhar"
+                  value={formData.motherAadhar}
+                  onChange={handleChange}
+                  placeholder="Enter Aadhaar No"
+                />
               </Col>
             </Row>
-
             <Row className="mb-3">
               <Col md={4}>
-                <Form.Group controlId="motherMobile">
-                  <Form.Label>Mobile Number</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Enter Mobile Number"
-                    name="motherMobile"
-                    value={formData.motherMobile}
-                    onChange={handleChange}
-                  />
-                </Form.Group>
+                <InputField
+                  label="Mobile Number"
+                  type="text"
+                  name="motherMobile"
+                  value={formData.motherMobile}
+                  onChange={handleChange}
+                  placeholder="Enter Mobile Number"
+                />
               </Col>
             </Row>
-
-            {/* Action Buttons */}
             <div className="d-flex justify-content-center mt-4">
-              <Button variant="danger" className="me-2" type="reset" onClick={handleReset}>
-                CANCEL
-              </Button>
-              <Button variant="primary" type="submit">
-                UPDATE
-              </Button>
+              <ButtonComponent type="reset" variant="danger" label="RESET" className="me-2" onClick={handleReset} />
+              <ButtonComponent type="submit" variant="primary" label="CREATE" />
             </div>
           </>
         )}
@@ -242,5 +276,4 @@ function FamilyDetailsForm() {
     </div>
   );
 }
-
 export default FamilyDetailsForm;
