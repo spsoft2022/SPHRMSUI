@@ -1,7 +1,9 @@
+import React, { useState, useEffect } from "react";
+import { FaEdit, FaTrashAlt, FaEye, FaPaperclip } from "react-icons/fa";
+import { Modal, Button, Table, Spinner, ListGroup, Row, Col, Form } from "react-bootstrap";
 import axios from "axios";
-import { useEffect, useState } from "react";
-import { Button, Col, Form, ListGroup, Row, Spinner } from "react-bootstrap";
-import { FaPaperclip } from "react-icons/fa";
+import InputField from "../../shared/InputField";
+import ButtonComponent from "../../shared/ButtonComponent";
 
 function EmploymentDetailsForm() {
   const [associateNo, setAssociateNo] = useState("");
@@ -15,6 +17,12 @@ function EmploymentDetailsForm() {
   const [suggestions, setSuggestions] = useState([]);
   const [isAssociateValid, setIsAssociateValid] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [submittedData, setSubmittedData] = useState(null);
+
+  // For modal view
+  const [showModal, setShowModal] = useState(false);
+  const [viewDocument, setViewDocument] = useState(null);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setEmployment({ ...employment, [name]: value });
@@ -26,7 +34,6 @@ function EmploymentDetailsForm() {
     setIsAssociateValid(false); // reset until user selects
   };
 
-  // Fetch matching associates immediately (no debounce)
   const fetchAssociates = async (number) => {
     if (!number) {
       setSuggestions([]);
@@ -53,7 +60,6 @@ function EmploymentDetailsForm() {
     }
   }, [associateNo]);
 
-  // When user selects from dropdown
   const handleSelectAssociate = (assoc) => {
     setAssociateNo(assoc.associateNo); // fill input
     setIsAssociateValid(true); // show form
@@ -61,10 +67,10 @@ function EmploymentDetailsForm() {
   };
 
   const handleFileChange = (e) => {
-    setDocument(e.target.files[0]);
+    setDocument(e.target.files[0]); // Store the selected file in state
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!associateNo) {
@@ -72,21 +78,63 @@ function EmploymentDetailsForm() {
       return;
     }
 
-    console.log("Employment Details Submitted:", {
-      associateNo,
-      ...employment,
-      document,
-    });
+    const formData = new FormData();
+    formData.append("associateNo", associateNo);
+    formData.append("dateOfJoining", employment.dateOfJoining);
+    formData.append("lastWorkingDate", employment.lastWorkingDate);
+    formData.append("organizationName", employment.organizationName);
+    formData.append("workLocation", employment.workLocation);
 
-    setEmployment({
-      dateOfJoining: "",
-      lastWorkingDate: "",
-      organizationName: "",
-      workLocation: "",
-    });
-    setAssociateNo("");
-    setDocument(null);
+    if (document) {
+      formData.append("document", document); // Append file if selected
+    }
+
+    try {
+      const response = await axios.post("http://localhost:5000/associates/employment", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      if (response.status === 201) {
+        setSubmittedData({
+          associateNo,
+          dateOfJoining: employment.dateOfJoining,
+          lastWorkingDate: employment.lastWorkingDate,
+          organizationName: employment.organizationName,
+          workLocation: employment.workLocation,
+          document: document ? document.name : "No file uploaded",
+        });
+      }
+       setEmployment({
+        dateOfJoining: "",
+        lastWorkingDate: "",
+        organizationName: "",
+        workLocation: "",
+      }); // Clear employment details fields
+    } catch (error) {
+      console.error("Error submitting employment data:", error);
+    }
   };
+
+  // Action Handlers for Edit, View, Delete
+  const handleView = (data) => {
+    // Show modal with the uploaded document
+    setViewDocument(data.document); // Set the document to view
+    setShowModal(true); // Open the modal
+  };
+
+  const handleEdit = (data) => {
+  };
+
+  const handleDelete = (associateNo) => {
+    const confirmDelete = window.confirm(`Are you sure you want to delete Associate No: ${associateNo}?`);
+    if (confirmDelete) {
+      setSubmittedData(null); // Optionally remove the deleted data from state
+    }
+  };
+
+  const handleCloseModal = () => setShowModal(false); // Close modal
 
   return (
     <div className="container mt-4">
@@ -125,78 +173,148 @@ function EmploymentDetailsForm() {
 
             <div className="row">
               <div className="col-md-3">
-                <Form.Group className="mb-3">
-                  <Form.Label>Date of Joining</Form.Label>
-                  <Form.Control
-                    type="date"
-                    name="dateOfJoining"
-                    value={employment.dateOfJoining}
-                    onChange={handleChange}
-                  />
-                </Form.Group>
+                <InputField
+                  label="Date of Joining"
+                  type="date"
+                  name="dateOfJoining"
+                  value={employment.dateOfJoining}
+                  onChange={handleChange}
+                />
               </div>
 
               <div className="col-md-3">
-                <Form.Group className="mb-3">
-                  <Form.Label>Last Working Date</Form.Label>
-                  <Form.Control
-                    type="date"
-                    name="lastWorkingDate"
-                    value={employment.lastWorkingDate}
-                    onChange={handleChange}
-                  />
-                </Form.Group>
+                <InputField
+                  label="Last Working Date"
+                  type="date"
+                  name="lastWorkingDate"
+                  value={employment.lastWorkingDate}
+                  onChange={handleChange}
+                />
               </div>
 
               <div className="col-md-3">
-                <Form.Group className="mb-3">
-                  <Form.Label>Organization Name</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="organizationName"
-                    placeholder="Enter Organization Name"
-                    value={employment.organizationName}
-                    onChange={handleChange}
-                  />
-                </Form.Group>
+                <InputField
+                  label="Organization Name"
+                  type="text"
+                  name="organizationName"
+                  value={employment.organizationName}
+                  onChange={handleChange}
+                  placeholder="Enter Organization Name"
+                />
               </div>
 
               <div className="col-md-3">
-                <Form.Group className="mb-3">
-                  <Form.Label>Work Location</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="workLocation"
-                    placeholder="Enter Work Location"
-                    value={employment.workLocation}
-                    onChange={handleChange}
-                  />
-                </Form.Group>
+                <InputField
+                  label="Work Location"
+                  type="text"
+                  name="workLocation"
+                  value={employment.workLocation}
+                  onChange={handleChange}
+                  placeholder="Enter Work Location"
+                />
               </div>
             </div>
 
             {/* Document Upload with working label */}
             <Form.Group className="mb-3">
-              <Form.Label htmlFor="fileUpload" style={{ cursor: "pointer" }} className="">
+              <Form.Label htmlFor="fileUpload" style={{ cursor: "pointer" }}>
                 <FaPaperclip size={15} className="me-2" />
                 Upload Document
               </Form.Label>
-              <Form.Control type="file" id="fileUpload" onChange={handleFileChange} style={{ display: "none" }} />
-              {document && (
-                <div className="mt-2 text-primary">
-                  Selected: <strong>{document.name}</strong>
-                </div>
-              )}
+              <Form.Control
+                type="file"
+                id="fileUpload"
+                onChange={handleFileChange}
+                style={{ display: "none" }}
+              />
+
             </Form.Group>
 
+
             <div className="text-center mt-3">
-              <Button type="submit" variant="primary" className="mt-2">
-                CREATE
-              </Button>
+              <ButtonComponent
+                label="CREATE"
+                type="submit"
+                variant="primary"
+                className="mt-2"
+              />
             </div>
           </>
         )}
       </Form>
+
+      {/* Table to show submitted data */}
+      {submittedData && (
+        <div className="mt-4">
+          <Table  bordered>
+            <thead>
+              <tr>
+                <th>Associate No</th>
+                <th>Date of Joining</th>
+                <th>Last Working Date</th>
+                <th>Organization Name</th>
+                <th>Work Location</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{submittedData.associateNo}</td>
+                <td>{submittedData.dateOfJoining}</td>
+                <td>{submittedData.lastWorkingDate}</td>
+                <td>{submittedData.organizationName}</td>
+                <td>{submittedData.workLocation}</td>
+                <td>
+                  <FaEye
+                    size={2}
+                    className="me-3 text-primary"
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => handleView(submittedData)} // View document
+                  />
+                  <FaEdit
+                    size={2}
+                    className="me-3 text-warning"
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => handleEdit(submittedData)} // Edit details
+                  />
+                  <FaTrashAlt
+                    size={2}
+                    className="me-3 text-danger"
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => handleDelete(submittedData.associateNo)} // Delete data
+                  />
+                </td>
+              </tr>
+            </tbody>
+          </Table>
+        </div>
+      )}
+
+
+      {/* Modal for viewing document */}
+      <Modal show={showModal} onHide={handleCloseModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Uploaded Document</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {viewDocument ? (
+            <div>
+              {/* Display the document name and use it as the link text */}
+              <a href={URL.createObjectURL(document)} target="_blank" rel="noopener noreferrer">
+                {document.name} {/* This will show the document name */}
+              </a>
+            </div>
+          ) : (
+            <p>No document uploaded</p>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseModal}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
     </div>
   );
 }

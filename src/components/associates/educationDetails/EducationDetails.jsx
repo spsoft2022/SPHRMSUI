@@ -1,10 +1,13 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Button, Col, Form, ListGroup, Row, Spinner } from "react-bootstrap";
+import { FaEdit, FaTrashAlt, FaEye} from "react-icons/fa";
+import { Modal,Table, Spinner, ListGroup, Row, Col, Form } from "react-bootstrap";
+import InputField from "../../shared/InputField";
+import ButtonComponent from "../../shared/ButtonComponent";
+import SelectField from "../../shared/SelectField";
 
 const EducationDetails = () => {
   const [formData, setFormData] = useState({
-    associateNo: "",
     qualification: "",
     specialization: "",
     boardName: "",
@@ -15,14 +18,17 @@ const EducationDetails = () => {
     percentage: "",
   });
 
-  const [records, setRecords] = useState([]);
-  const [educations, setEducations] = useState([]);
-  const [suggestions, setSuggestions] = useState([]);
+  const [educations, setEducations] = useState([]); // master education list
+  const [suggestions, setSuggestions] = useState([]); // associate search
   const [isAssociateValid, setIsAssociateValid] = useState(false);
   const [loading, setLoading] = useState(false);
   const [associateNo, setAssociateNo] = useState("");
+  const [educationTableData, setEducationTableData] = useState([]); // store table data
+  const [showModal, setShowModal] = useState(false);
+   const [viewDocument, setViewDocument] = useState(null);
+    const [submittedData, setSubmittedData] = useState(null);
 
-  // Fetch educations (already in your code)
+  // ---------------- Fetch master education list ----------------
   useEffect(() => {
     fetchEducations();
   }, []);
@@ -36,14 +42,14 @@ const EducationDetails = () => {
     }
   };
 
-  // Allow only numbers for Associate No
+  // ---------------- Handle associate input ----------------
   const handleAssociateChange = (e) => {
-    const value = e.target.value.replace(/\D/g, ""); // remove non-digits
+    const value = e.target.value.replace(/\D/g, ""); // only numbers
     setAssociateNo(value);
-    setIsAssociateValid(false); // reset until user selects
+    setIsAssociateValid(false);
   };
 
-  // Fetch matching associates immediately (no debounce)
+  // ---------------- Fetch associate suggestions ----------------
   const fetchAssociates = async (number) => {
     if (!number) {
       setSuggestions([]);
@@ -70,14 +76,7 @@ const EducationDetails = () => {
     }
   }, [associateNo]);
 
-  // When user selects from dropdown
-  const handleSelectAssociate = (assoc) => {
-    setAssociateNo(assoc.associateNo); // fill input
-    setIsAssociateValid(true); // show form
-    setSuggestions([]); // clear suggestions
-    document.activeElement.blur(); // remove focus from input (closes dropdown neatly)
-  };
-
+  // ---------------- Handle input changes ----------------
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -85,26 +84,84 @@ const EducationDetails = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  // ---------------- Handle form submission ----------------
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Saved Data:", formData);
+    try {
+      const payload = { associateNo, ...formData };
+      const res = await axios.post("http://localhost:5000/associates/education", payload);
 
-    setRecords([...records, { ...formData }]);
+      if (res.status === 201) {
+        alert("✅ Education details saved successfully");
 
-    // Reset form after submission
-    setFormData({
-      associateNo: "",
-      qualification: "",
-      specialization: "",
-      boardName: "",
-      instituteName: "",
-      universityName: "",
-      enrolledYear: "",
-      yearOfPassing: "",
-      percentage: "",
-    });
+        // Add the new data to the table
+        setEducationTableData([
+          ...educationTableData,
+          {
+            associateNo,
+            qualification: formData.qualification,
+            specialization: formData.specialization,
+            boardName: formData.boardName,
+            instituteName: formData.instituteName,
+            universityName: formData.universityName,
+            enrolledYear: formData.enrolledYear,
+            yearOfPassing: formData.yearOfPassing,
+            percentage: formData.percentage,
+          },
+        ]);
+
+        // Clear form data
+        setFormData({
+          qualification: "",
+          specialization: "",
+          boardName: "",
+          instituteName: "",
+          universityName: "",
+          enrolledYear: "",
+          yearOfPassing: "",
+          percentage: "",
+        });
+      }
+    } catch (err) {
+      console.error("Error saving education:", err);
+      alert("❌ Failed to save education details");
+    }
   };
 
+  // ---------------- Handle select associate ----------------
+  const handleSelectAssociate = (assoc) => {
+    // Set the associate number
+    setAssociateNo(assoc.associateNo);
+
+    // Clear any previous suggestions
+    setSuggestions([]);
+
+    // Optionally, if you need to fetch additional details about the selected associate, you can do that here.
+    // For now, we just set the associate as valid.
+    setIsAssociateValid(true);
+
+    // Optionally, blur the input to remove focus once a selection is made
+    document.activeElement.blur();
+  };
+const handleView = (data) => {
+  if (data && data.document) {
+    setViewDocument(data.document); 
+    setShowModal(true); 
+  } else {
+    alert("No document available for this education entry.");
+  }
+};
+
+
+  const handleEdit = (data) => {
+  };
+
+  const handleDelete = (associateNo) => {
+    const confirmDelete = window.confirm(`Are you sure you want to delete Associate No: ${associateNo}?`);
+    if (confirmDelete) {
+      setSubmittedData(null); // Optionally remove the deleted data from state
+    }
+  };
   return (
     <div>
       <Form onSubmit={handleSubmit}>
@@ -128,7 +185,11 @@ const EducationDetails = () => {
             {suggestions.length > 0 && (
               <ListGroup className="position-absolute w-100" style={{ zIndex: 1000 }}>
                 {suggestions.map((assoc) => (
-                  <ListGroup.Item key={assoc._id} action onClick={() => handleSelectAssociate(assoc)}>
+                  <ListGroup.Item
+                    key={assoc._id}
+                    action
+                    onClick={() => handleSelectAssociate(assoc)}
+                  >
                     {assoc.associateNo} - {assoc.initiation?.fullName}
                   </ListGroup.Item>
                 ))}
@@ -143,140 +204,172 @@ const EducationDetails = () => {
 
             <Row>
               <Col md={4}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Qualification</Form.Label>
-                  <Form.Select name="qualification" value={formData.qualification} onChange={handleChange} required>
-                    <option value="" disabled>
-                      Select Qualification
-                    </option>
-                    {educations.map((edu) => (
-                      <option key={edu._id} value={edu.name}>
-                        {edu.name} ({edu.category})
-                      </option>
-                    ))}
-                  </Form.Select>
-                </Form.Group>
+                <SelectField
+                  label="Qualification"
+                  name="qualification"
+                  value={formData.qualification}
+                  onChange={handleChange}
+                  options={educations.map((edu) => ({
+                    value: edu.name,
+                    label: `${edu.name} (${edu.category})`,
+                  }))}
+                  placeholder="Select Qualification"
+                  required
+                />
               </Col>
 
               <Col md={4}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Specialization</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="specialization"
-                    value={formData.specialization}
-                    onChange={handleChange}
-                    placeholder="Enter Specialization"
-                  />
-                </Form.Group>
+                <InputField
+                  label="Specialization"
+                  type="text"
+                  name="specialization"
+                  value={formData.specialization}
+                  onChange={handleChange}
+                  placeholder="Enter Specialization"
+                />
               </Col>
 
               <Col md={4}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Board Name</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="boardName"
-                    value={formData.boardName}
-                    onChange={handleChange}
-                    placeholder="Enter Board Name"
-                  />
-                </Form.Group>
+                <InputField
+                  label="Board Name"
+                  type="text"
+                  name="boardName"
+                  value={formData.boardName}
+                  onChange={handleChange}
+                  placeholder="Enter Board Name"
+                />
               </Col>
             </Row>
 
             <Row>
               <Col md={4}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Institute Name</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="instituteName"
-                    value={formData.instituteName}
-                    onChange={handleChange}
-                    placeholder="Enter Institute Name"
-                  />
-                </Form.Group>
+                <InputField
+                  label="Institute Name"
+                  type="text"
+                  name="instituteName"
+                  value={formData.instituteName}
+                  onChange={handleChange}
+                  placeholder="Enter Institute Name"
+                />
               </Col>
 
               <Col md={4}>
-                <Form.Group className="mb-3">
-                  <Form.Label>University Name</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="universityName"
-                    value={formData.universityName}
-                    onChange={handleChange}
-                    placeholder="Enter University Name"
-                  />
-                </Form.Group>
+                <InputField
+                  label="University Name"
+                  type="text"
+                  name="universityName"
+                  value={formData.universityName}
+                  onChange={handleChange}
+                  placeholder="Enter University Name"
+                />
               </Col>
 
               <Col md={4}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Enrolled Year</Form.Label>
-                  <Form.Select name="enrolledYear" value={formData.enrolledYear} onChange={handleChange} required>
-                    <option value="" disabled>
-                      Select Enrolled Year
-                    </option>
-                    <option value="2016">2016</option>
-                    <option value="2017">2017</option>
-                    <option value="2018">2018</option>
-                    <option value="2019">2019</option>
-                    <option value="2020">2020</option>
-                    <option value="2021">2021</option>
-                    <option value="2022">2022</option>
-                    <option value="2023">2023</option>
-                    <option value="2024">2024</option>
-                    <option value="2025">2025</option>
-                  </Form.Select>
-                </Form.Group>
+                <SelectField
+                  label="Enrolled Year"
+                  name="enrolledYear"
+                  value={formData.enrolledYear}
+                  onChange={handleChange}
+                  options={["2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025"].map(
+                    (year) => ({ value: year, label: year })
+                  )}
+                  placeholder="Select Enrolled Year"
+                  required
+                />
               </Col>
             </Row>
 
             <Row>
               <Col md={4}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Year of Passing</Form.Label>
-                  <Form.Select name="yearOfPassing" value={formData.yearOfPassing} onChange={handleChange} required>
-                    <option value="" disabled>
-                      Select Year of Passing
-                    </option>
-                    <option value="2016">2016</option>
-                    <option value="2017">2017</option>
-                    <option value="2018">2018</option>
-                    <option value="2019">2019</option>
-                    <option value="2020">2020</option>
-                    <option value="2021">2021</option>
-                    <option value="2022">2022</option>
-                    <option value="2023">2023</option>
-                    <option value="2024">2024</option>
-                    <option value="2025">2025</option>
-                  </Form.Select>
-                </Form.Group>
+                <SelectField
+                  label="Year of Passing"
+                  name="yearOfPassing"
+                  value={formData.yearOfPassing}
+                  onChange={handleChange}
+                  options={["2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025"].map(
+                    (year) => ({ value: year, label: year })
+                  )}
+                  placeholder="Select Year of Passing"
+                  required
+                />
               </Col>
 
               <Col md={4}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Percentage</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="percentage"
-                    value={formData.percentage}
-                    onChange={handleChange}
-                    placeholder="Enter Percentage"
-                  />
-                </Form.Group>
+                <InputField
+                  label="Percentage"
+                  type="text"
+                  name="percentage"
+                  value={formData.percentage}
+                  onChange={handleChange}
+                  placeholder="Enter Percentage"
+                />
               </Col>
             </Row>
+
             <div className="text-center mt-3">
-              <Button type="submit" variant="primary" className="mt-2">
-                CREATE
-              </Button>
+              <ButtonComponent label="CREATE" type="submit" variant="primary" className="mt-2" />
             </div>
           </>
         )}
       </Form>
+
+      {/* Table to show education data */}
+      {educationTableData.length > 0 && (
+        <div className="mt-4">
+
+          <Table bordered>
+            <thead>
+              <tr>
+                <th>Qualification</th>
+                <th>Specialization</th>
+                <th>Board Name</th>
+                <th>Institute Name</th>
+                <th>University Name</th>
+                <th>Enrolled Year</th>
+                <th>Year of Passing</th>
+                <th>Percentage</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {educationTableData.map((edu, index) => (
+                <tr key={index}>
+                  <td>{edu.qualification}</td>
+                  <td>{edu.specialization}</td>
+                  <td>{edu.boardName}</td>
+                  <td>{edu.instituteName}</td>
+                  <td>{edu.universityName}</td>
+                  <td>{edu.enrolledYear}</td>
+                  <td>{edu.yearOfPassing}</td>
+                  <td>{edu.percentage}</td>
+                  <td>
+                    <FaEye
+                      size={20}
+                      className="me-3 text-primary"
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => handleView(edu)} // View document
+                    />
+                    <FaEdit
+                      size={20}
+                      className="me-3 text-warning"
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => handleEdit(edu)} // Edit details
+                    />
+                    <FaTrashAlt
+                      size={20}
+                      className="me-3 text-danger"
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => handleDelete(edu.associateNo)} // Delete data
+                    />
+                  </td>
+
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </div>
+      )}
+       
     </div>
   );
 };
