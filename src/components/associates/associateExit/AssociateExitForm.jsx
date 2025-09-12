@@ -1,8 +1,11 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Button, Col, Form, ListGroup, Row } from "react-bootstrap";
+import { Col, Form, ListGroup, Row } from "react-bootstrap";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
+import InputField from "../../shared/InputField";
+import ButtonComponent from "../../shared/ButtonComponent";
 
 const AssociateExitForm = () => {
   const [associateNo, setAssociateNo] = useState("");
@@ -14,13 +17,16 @@ const AssociateExitForm = () => {
   const [suggestions, setSuggestions] = useState([]);
   const [isAssociateValid, setIsAssociateValid] = useState(false);
   const [loading, setLoading] = useState(false);
+
   // Allow only numbers for Associate No
   const handleAssociateChange = (e) => {
-    const value = e.target.value.replace(/\D/g, ""); // remove non-digits
+    const value = e.target.value.replace(/\D/g, "");
     setAssociateNo(value);
-    setIsAssociateValid(false); // reset until user selects
+    setIsAssociateValid(false);
+    setFormData({ resignationDate: "", lastWorkingDay: "", reason: "" }); // reset form
   };
-  // Fetch matching associates immediately (no debounce)
+
+  // Fetch matching associates
   const fetchAssociates = async (number) => {
     if (!number) {
       setSuggestions([]);
@@ -28,7 +34,9 @@ const AssociateExitForm = () => {
     }
     setLoading(true);
     try {
-      const response = await axios.get(`http://localhost:5000/associates/search/${number}`);
+      const response = await axios.get(
+        `http://localhost:5000/associates/search/${number}`
+      );
       if (response.status === 200) {
         setSuggestions(response.data);
       }
@@ -47,15 +55,39 @@ const AssociateExitForm = () => {
     }
   }, [associateNo]);
 
-  // When user selects from dropdown
-  const handleSelectAssociate = (assoc) => {
-    setAssociateNo(assoc.associateNo); // fill input
-    setIsAssociateValid(true); // show form
-    setSuggestions([]); // clear suggestions
-    document.activeElement.blur(); // remove focus from input (closes dropdown neatly)
+  // Select associate from dropdown
+  const handleSelectAssociate = async (assoc) => {
+    setAssociateNo(assoc.associateNo);
+    setIsAssociateValid(true);
+    setSuggestions([]);
+    document.activeElement.blur();
+
+    try {
+      // Fetch existing exit details
+      const res = await axios.get(
+        `http://localhost:5000/associates/exit/${assoc.associateNo}`
+      );
+      if (res.status === 200 && res.data) {
+        setFormData({
+          resignationDate: res.data.resignationDate
+            ? res.data.resignationDate.split("T")[0]
+            : "",
+          lastWorkingDay: res.data.lastWorkingDay
+            ? res.data.lastWorkingDay.split("T")[0]
+            : "",
+          reason: res.data.reason || "",
+        });
+        toast.info(" Exit details already exist. You can update them.");
+      } else {
+        setFormData({ resignationDate: "", lastWorkingDay: "", reason: "" });
+      }
+    } catch (err) {
+      // No exit details yet
+      setFormData({ resignationDate: "", lastWorkingDay: "", reason: "" });
+    }
   };
 
-  // Handle other input changes
+  // Input change
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -63,39 +95,47 @@ const AssociateExitForm = () => {
     });
   };
 
-  // Handle Submit (call backend)
+  // Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const finalData = { associateNo, ...formData };
-      const res = await axios.post("http://localhost:5000/associates/exit", finalData);
-      toast.success(res.data.message || "Exit details saved successfully");
-      setAssociateNo("");
-      setFormData({ resignationDate: "", lastWorkingDay: "", reason: "" });
+      const res = await axios.post(
+        "http://localhost:5000/associates/exit",
+        finalData
+      );
+      toast.success(res.data.message || "Exit details saved successfully ✅");
     } catch (err) {
-      toast.error(err.response?.data?.message || "Error saving exit details");
+      toast.error(err.response?.data?.message || " Error saving exit details");
     }
   };
 
   return (
-    <>
+    <div className="container mt-4">
+      <h3 className="mb-3">Associate Exit Form</h3>
       <Form style={{ margin: "0 auto" }} onSubmit={handleSubmit}>
         <Row>
-          <Col md={6}>
-            <Form.Group className="mb-3">
-              <Form.Label>Associate No</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter Associate No"
-                value={associateNo}
-                onChange={handleAssociateChange}
-                required
-              />
-            </Form.Group>
+          <Col md={6} className="position-relative">
+            <InputField
+              label="Associate No"
+              type="text"
+              name="associateNo"
+              value={associateNo}
+              onChange={handleAssociateChange}
+              placeholder="Enter Associate No"
+              required
+            />
             {suggestions.length > 0 && (
-              <ListGroup className="position-absolute w-100" style={{ zIndex: 1000 }}>
+              <ListGroup
+                className="position-absolute w-100"
+                style={{ zIndex: 1000 }}
+              >
                 {suggestions.map((assoc) => (
-                  <ListGroup.Item key={assoc._id} action onClick={() => handleSelectAssociate(assoc)}>
+                  <ListGroup.Item
+                    key={assoc._id}
+                    action
+                    onClick={() => handleSelectAssociate(assoc)}
+                  >
                     {assoc.associateNo} - {assoc.initiation?.fullName}
                   </ListGroup.Item>
                 ))}
@@ -104,59 +144,58 @@ const AssociateExitForm = () => {
           </Col>
 
           <Col md={6}>
-            <Form.Group className="mb-3">
-              <Form.Label>Date of Resignation</Form.Label>
-              <Form.Control
-                type="date"
-                name="resignationDate"
-                value={formData.resignationDate}
-                onChange={handleChange}
-                required
-              />
-            </Form.Group>
+            <InputField
+              label="Date of Resignation"
+              type="date"
+              name="resignationDate"
+              value={formData.resignationDate}
+              onChange={handleChange}
+              required
+            />
           </Col>
         </Row>
 
         <Row>
           <Col md={6}>
-            <Form.Group className="mb-3">
-              <Form.Label>Last Working Day</Form.Label>
-              <Form.Control
-                type="date"
-                name="lastWorkingDay"
-                value={formData.lastWorkingDay}
-                onChange={handleChange}
-                required
-              />
-            </Form.Group>
+            <InputField
+              label="Last Working Day"
+              type="date"
+              name="lastWorkingDay"
+              value={formData.lastWorkingDay}
+              onChange={handleChange}
+              required
+            />
           </Col>
 
           <Col md={6}>
-            <Form.Group className="mb-3">
-              <Form.Label>Reason</Form.Label>
-              <Form.Control
-                as="textarea"
-                rows={1}
-                placeholder="Enter Reason"
-                name="reason"
-                value={formData.reason}
-                onChange={handleChange}
-                required
-              />
-            </Form.Group>
+            <InputField
+              label="Reason"
+              as="textarea"
+              rows={1}
+              placeholder="Enter Reason"
+              name="reason"
+              value={formData.reason}
+              onChange={handleChange}
+              required
+            />
           </Col>
         </Row>
 
-        <div className="text-center mt-3">
-          <Button variant="primary" type="submit">
-            SUBMIT
-          </Button>
-        </div>
+        {isAssociateValid && (
+          <div className="text-center mt-3">
+            <ButtonComponent
+              variant="primary"
+              type="submit"
+              disabled={loading}
+              label={formData.resignationDate ? "Update" : "Create"}
+            />
+          </div>
+        )}
       </Form>
 
-      {/* Toast container */}
-      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} newestOnTop />
-    </>
+      {/* Toast Notifications */}
+      <ToastContainer position="top-right" autoClose={3000} newestOnTop />
+    </div>
   );
 };
 
